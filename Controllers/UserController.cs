@@ -45,7 +45,7 @@ namespace giftcard_api.Controllers
                 }
                 var user = new User
                 {
-                    IdRole = subscriberdto.IdRole,
+                    IdRole = 2,
                     Email = subscriberdto.Email,
                     Password = subscriberdto.Password,
                     Adresse = subscriberdto.Adresse,
@@ -69,7 +69,7 @@ namespace giftcard_api.Controllers
                 await _context.SaveChangesAsync();
                 var subscriber = new Subscriber
                 {
-                    IdRole=2,
+
                     IdUser = user.Id,
                     IdSubscriberWallet = subscriberWallet.Id,
                     SubscriberName = subscriberdto.SubscriberName
@@ -100,7 +100,7 @@ namespace giftcard_api.Controllers
                 }
                 var user = new User
                 {
-                    IdRole = merchantdto.IdRole,
+                    IdRole = 3,
                     Email = merchantdto.Email,
                     Password = merchantdto.Password,
                     Adresse = merchantdto.Adresse,
@@ -124,7 +124,6 @@ namespace giftcard_api.Controllers
                 await _context.SaveChangesAsync();
                 var merchant = new Merchant
                 {
-                    IdRole=3,
                     IdUser = user.Id,
                     IdMerchantWallet = merchantWallet.Id,
                     Nom = merchantdto.Nom,
@@ -156,7 +155,7 @@ namespace giftcard_api.Controllers
                 }
                 var user = new User
                 {
-                    IdRole = beneficiarydto.IdRole,
+                    IdRole = 1,
                     Email = beneficiarydto.Email,
                     Password = beneficiarydto.Password,
                     Adresse = beneficiarydto.Adresse,
@@ -182,7 +181,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
                     var beneficiary = new Beneficiary
                     {
-                        IdRole=1,
+
                         IdUser = user.Id,
                         IdBeneficiaryWallet = beneficiaryWallet.Id,
                         Nom = beneficiarydto.Nom,
@@ -221,7 +220,7 @@ namespace giftcard_api.Controllers
 
         // POST: api/auth/login
         [HttpPost("login")]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Login(LoginModel user)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email && u.Password == user.Password);
 
@@ -230,7 +229,7 @@ namespace giftcard_api.Controllers
                 // Générez un jeton JWT pour l'utilisateur authentifié
                 var token = _jwtService.GenerateToken(existingUser);
                 var refreshToken = _jwtService.GenerateRefreshToken();
-                _jwtService.SaveRefreshToken(user, refreshToken);
+                _jwtService.SaveRefreshToken(existingUser, refreshToken);
 
                 return Ok(new { Token = token });
             }
@@ -279,6 +278,21 @@ namespace giftcard_api.Controllers
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
+        }
+        [Authorize]
+        [HttpGet("byrole/{idRole}")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int idRole)
+        {
+            var usersByRole = await _context.Users
+                                            .Where(user => user.IdRole == idRole)
+                                            .ToListAsync();
+
+            if (usersByRole == null || !usersByRole.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(usersByRole);
         }
 
         [Authorize]

@@ -13,22 +13,27 @@ namespace giftcard_api.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private readonly IRoleService _roleService;
 
-        public JwtService(IConfiguration configuration, ApplicationDbContext context)
+        public JwtService(IConfiguration configuration, ApplicationDbContext context,IRoleService roleService)
         {
             _configuration = configuration;
             _context = context;
+            _roleService = roleService;
         }
-        public string GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            string RoleName = await _roleService.GetRoleNameByIdAsync(user.IdRole);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Role, RoleName),
                 // Ajoutez d'autres claims selon vos besoins
             }),
                 Expires = DateTime.UtcNow.AddDays(3),

@@ -24,5 +24,6 @@ namespace giftcard_api.Models
             get => _roleNom;
             set => _roleNom = value;
         }
+
     }
 }

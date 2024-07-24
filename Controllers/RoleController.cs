@@ -102,7 +102,7 @@ namespace giftcard_api.Controllers
             return _context.Roles.Any(e => e.Id == id);
         }
         [Authorize]
-        [HttpPut("update-role/{userId}/{roleId}")]
+        [HttpPut("update-user-role/{userId}/{roleId}")]
         public async Task<IActionResult> UpdateUserRole(int userId, int roleId)
         {
             // Récupération de l'utilisateur avec l'Id spécifié

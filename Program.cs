@@ -27,6 +27,7 @@ builder.Services.AddControllers()
 
 
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

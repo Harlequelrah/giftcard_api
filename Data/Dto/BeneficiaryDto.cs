@@ -5,9 +5,6 @@ namespace giftcard_api.Data
 {
     public class BeneficiaryDto
     {
-        [JsonIgnore]
-        public int IdRole { get; set; }
-
         [EmailAddress]
         [Required]
         public string Email { get; set; }
