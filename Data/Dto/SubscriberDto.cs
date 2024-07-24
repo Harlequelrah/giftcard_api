@@ -15,5 +15,7 @@ namespace giftcard_api.Data
         public string Adresse { get; set; }
         [Required]
         public string SubscriberName { get; set; }
+        [Required]
+        public string Telephone { get; set; }
     }
 }

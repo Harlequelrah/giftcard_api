@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace giftcard_api.Models
 {
-    public class Subscriber:User
+    public class Subscriber
     {
         private int _id;
         private int _idUser;

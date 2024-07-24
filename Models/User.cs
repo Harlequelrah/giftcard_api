@@ -12,6 +12,7 @@ namespace giftcard_api.Models
         private int _idRole;
         private string _email;
         private string _password;
+        private string _telephone;
         private string? _refreshToken;
         private DateTime? _refreshTokenExpiryTime;
         private DateTime? _dateInscription;
@@ -39,6 +40,11 @@ namespace giftcard_api.Models
         {
             get => _email;
             set => _email = value;
+        }
+        public string Telephone
+        {
+            get => _telephone;
+            set => _telephone = value;
         }
 
         public string Password

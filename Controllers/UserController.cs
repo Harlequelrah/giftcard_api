@@ -31,53 +31,63 @@ namespace giftcard_api.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Vérifiez si l'utilisateur existe déjà
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == subscriberdto.Email);
-                if (existingUser != null)
+                try
                 {
-                    return BadRequest(new
+                    // Vérifiez si l'utilisateur existe déjà
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == subscriberdto.Email);
+                    if (existingUser != null)
                     {
-                        errors = new Dictionary<string, string[]>
+                        return BadRequest(new
+                        {
+                            errors = new Dictionary<string, string[]>
                         {
                             { "email", new[] { "Ce Email est déjà utilisé." } }
                         }
-                    });
-                }
-                var user = new User
-                {
-                    IdRole = 2,
-                    Email = subscriberdto.Email,
-                    Password = subscriberdto.Password,
-                    Adresse = subscriberdto.Adresse,
-                    DateInscription = DateTime.UtcNow,
-                    RefreshToken = _jwtService.GenerateRefreshToken(),
-                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                    // Ajouter d'autres propriétés si nécessaire
-                };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                var subscriberWallet = new SubscriberWallet();
-                _context.SubscriberWallets.Add(subscriberWallet);
-                await _context.SaveChangesAsync();
-                var subscriberHistory = new SubscriberHistory
-                {
-                    Montant = 0.0,
-                    Date = DateTime.UtcNow,
-                    Action = SubscriberHistory.SubscriberActions.Initial,
-                };
-                _context.SubscriberHistories.Add(subscriberHistory);
-                await _context.SaveChangesAsync();
-                var subscriber = new Subscriber
-                {
+                        });
+                    }
+                    var user = new User
+                    {
+                        IdRole = 2,
+                        Email = subscriberdto.Email,
+                        Password = subscriberdto.Password,
+                        Adresse = subscriberdto.Adresse,
+                        Telephone = subscriberdto.Telephone,
+                        DateInscription = DateTime.UtcNow,
+                        RefreshToken = _jwtService.GenerateRefreshToken(),
+                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
+                        // Ajouter d'autres propriétés si nécessaire
+                    };
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                    var subscriberWallet = new SubscriberWallet();
+                    _context.SubscriberWallets.Add(subscriberWallet);
+                    await _context.SaveChangesAsync();
+                    var subscriber = new Subscriber
+                    {
+                        IdUser = user.Id,
+                        IdSubscriberWallet = subscriberWallet.Id,
+                        SubscriberName = subscriberdto.SubscriberName
+                    };
+                    _context.Subscribers.Add(subscriber);
+                    await _context.SaveChangesAsync();
+                    var subscriberHistory = new SubscriberHistory
+                    {
+                        IdSubscriber = subscriber.Id,
+                        Montant = 0.0,
+                        Date = DateTime.UtcNow,
+                        Action = SubscriberHistory.SubscriberActions.Initial,
+                    };
+                    _context.SubscriberHistories.Add(subscriberHistory);
+                    await _context.SaveChangesAsync();
 
-                    IdUser = user.Id,
-                    IdSubscriberWallet = subscriberWallet.Id,
-                    SubscriberName = subscriberdto.SubscriberName
-                };
-                _context.Subscribers.Add(subscriber);
-                await _context.SaveChangesAsync();
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new { Token = token, user, subscriber, subscriberWallet, subscriberHistory });
+                    var token =  await _jwtService.GenerateToken(user);
+                    return Ok(new { Token = token, user, subscriber, subscriberWallet, subscriberHistory });
+                }
+                catch (Exception ex)
+                {
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
             }
             return BadRequest(ModelState);
         }
@@ -86,54 +96,66 @@ namespace giftcard_api.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Vérifiez si l'utilisateur existe déjà
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == merchantdto.Email);
-                if (existingUser != null)
+                try
                 {
-                    return BadRequest(new
+                    // Vérifiez si l'utilisateur existe déjà
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == merchantdto.Email);
+                    if (existingUser != null)
                     {
-                        errors = new Dictionary<string, string[]>
+                        return BadRequest(new
+                        {
+                            errors = new Dictionary<string, string[]>
                         {
                             { "email", new[] { "Ce Email est déjà utilisé." } }
                         }
-                    });
+                        });
+                    }
+                    var user = new User
+                    {
+                        IdRole = 3,
+                        Email = merchantdto.Email,
+                        Password = merchantdto.Password,
+                        Adresse = merchantdto.Adresse,
+                        Telephone = merchantdto.Telephone,
+                        DateInscription = DateTime.UtcNow,
+                        RefreshToken = _jwtService.GenerateRefreshToken(),
+                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
+                        // Ajouter d'autres propriétés si nécessaire
+                    };
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                    var merchantWallet = new MerchantWallet();
+                    _context.MerchantWallets.Add(merchantWallet);
+                    await _context.SaveChangesAsync();
+                    var merchant = new Merchant
+                    {
+                        IdUser = user.Id,
+                        IdMerchantWallet = merchantWallet.Id,
+                        Nom = merchantdto.Nom,
+                        Prenom = merchantdto.Prenom,
+                    };
+                    _context.Merchants.Add(merchant);
+                    await _context.SaveChangesAsync();
+                    var merchantHistory = new MerchantHistory
+                    {
+                        IdMerchant = merchant.Id,
+                        Montant = 0.0,
+                        Date = DateTime.UtcNow,
+                        Action = MerchantHistory.MerchantActions.Initial,
+                    };
+                    _context.MerchantHistories.Add(merchantHistory);
+                    await _context.SaveChangesAsync();
+
+                    var token = await _jwtService.GenerateToken(user);
+                    return Ok(new { Token = token, user, merchant, merchantWallet, merchantHistory });
                 }
-                var user = new User
+                catch (Exception ex)
                 {
-                    IdRole = 3,
-                    Email = merchantdto.Email,
-                    Password = merchantdto.Password,
-                    Adresse = merchantdto.Adresse,
-                    DateInscription = DateTime.UtcNow,
-                    RefreshToken = _jwtService.GenerateRefreshToken(),
-                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                    // Ajouter d'autres propriétés si nécessaire
-                };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                var merchantWallet = new MerchantWallet();
-                _context.MerchantWallets.Add(merchantWallet);
-                await _context.SaveChangesAsync();
-                var merchantHistory = new MerchantHistory
-                {
-                    Montant = 0.0,
-                    Date = DateTime.UtcNow,
-                    Action = MerchantHistory.MerchantActions.Initial,
-                };
-                _context.MerchantHistories.Add(merchantHistory);
-                await _context.SaveChangesAsync();
-                var merchant = new Merchant
-                {
-                    IdUser = user.Id,
-                    IdMerchantWallet = merchantWallet.Id,
-                    Nom = merchantdto.Nom,
-                    Prenom = merchantdto.Prenom,
-                };
-                _context.Merchants.Add(merchant);
-                await _context.SaveChangesAsync();
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new { Token = token, user, merchant, merchantWallet, merchantHistory });
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
             }
+
             return BadRequest(ModelState);
         }
         [HttpPost("register/beneficiary")]
@@ -141,76 +163,86 @@ namespace giftcard_api.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Vérifiez si l'utilisateur existe déjà
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
-                if (existingUser != null)
+                try
                 {
-                    return BadRequest(new
+                    // Vérifiez si l'utilisateur existe déjà
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
+                    if (existingUser != null)
                     {
-                        errors = new Dictionary<string, string[]>
+                        return BadRequest(new
+                        {
+                            errors = new Dictionary<string, string[]>
                         {
                             { "email", new[] { "Ce Email est déjà utilisé." } }
                         }
-                    });
-                }
-                var user = new User
-                {
-                    IdRole = 1,
-                    Email = beneficiarydto.Email,
-                    Password = beneficiarydto.Password,
-                    Adresse = beneficiarydto.Adresse,
-                    DateInscription = DateTime.UtcNow,
-                    RefreshToken = _jwtService.GenerateRefreshToken(),
-                    RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                    // Ajouter d'autres propriétés si nécessaire
-                };
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
-                if (beneficiarydto.Has_gochap)
-                {
-                    var beneficiaryWallet = new BeneficiaryWallet();
-                    _context.BeneficiaryWallets.Add(beneficiaryWallet);
-                    await _context.SaveChangesAsync();
-                    var beneficiaryHistory = new BeneficiaryHistory
+                        });
+                    }
+                    var user = new User
                     {
-                        Montant = 0.0,
-                        Date = DateTime.UtcNow,
-                        Action = BeneficiaryHistory.BeneficiaryActions.Initial,
+                        IdRole = 1,
+                        Email = beneficiarydto.Email,
+                        Password = beneficiarydto.Password,
+                        Adresse = beneficiarydto.Adresse,
+                        Telephone = beneficiarydto.Telephone,
+                        DateInscription = DateTime.UtcNow,
+                        RefreshToken = _jwtService.GenerateRefreshToken(),
+                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
+                        // Ajouter d'autres propriétés si nécessaire
                     };
-                    _context.BeneficiaryHistories.Add(beneficiaryHistory);
+                    _context.Users.Add(user);
                     await _context.SaveChangesAsync();
-                    var beneficiary = new Beneficiary
+                    if (beneficiarydto.Has_gochap)
                     {
+                        var beneficiaryWallet = new BeneficiaryWallet();
+                        _context.BeneficiaryWallets.Add(beneficiaryWallet);
+                        await _context.SaveChangesAsync();
+                        var beneficiary = new Beneficiary
+                        {
 
-                        IdUser = user.Id,
-                        IdBeneficiaryWallet = beneficiaryWallet.Id,
-                        Nom = beneficiarydto.Nom,
-                        Prenom = beneficiarydto.Prenom,
-                        Has_gochap = beneficiarydto.Has_gochap,
-                    };
-                    _context.Beneficiaries.Add(beneficiary);
-                    await _context.SaveChangesAsync();
-                    var token = _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token, user, beneficiary, beneficiaryWallet, beneficiaryHistory });
+                            IdUser = user.Id,
+                            IdBeneficiaryWallet = beneficiaryWallet.Id,
+                            Nom = beneficiarydto.Nom,
+                            Prenom = beneficiarydto.Prenom,
+                            Has_gochap = beneficiarydto.Has_gochap,
+                        };
+                        _context.Beneficiaries.Add(beneficiary);
+                        await _context.SaveChangesAsync();
+                        var beneficiaryHistory = new BeneficiaryHistory
+                        {
+                            IdBeneficiary = beneficiary.Id,
+                            Montant = 0.0,
+                            Date = DateTime.UtcNow,
+                            Action = BeneficiaryHistory.BeneficiaryActions.Initial,
+                        };
+                        _context.BeneficiaryHistories.Add(beneficiaryHistory);
+                        await _context.SaveChangesAsync();
 
+
+                        var token = await _jwtService.GenerateToken(user);
+                        return Ok(new { Token = token, user, beneficiary, beneficiaryWallet, beneficiaryHistory });
+
+                    }
+                    else
+                    {
+                        var beneficiary = new Beneficiary
+                        {
+                            IdUser = user.Id,
+                            Nom = beneficiarydto.Nom,
+                            Prenom = beneficiarydto.Prenom,
+                            Has_gochap = beneficiarydto.Has_gochap,
+                        };
+                        _context.Beneficiaries.Add(beneficiary);
+                        await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
+                        var token = await _jwtService.GenerateToken(user);
+                        return Ok(new { Token = token, user, beneficiary });
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var beneficiary = new Beneficiary
-                    {
-                        IdUser = user.Id,
-                        Nom = beneficiarydto.Nom,
-                        Prenom = beneficiarydto.Prenom,
-                        Has_gochap = beneficiarydto.Has_gochap,
-                    };
-                    _context.Beneficiaries.Add(beneficiary);
-                    await _context.SaveChangesAsync();
-                    await _context.SaveChangesAsync();
-                    var token = _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token, user, beneficiary });
-
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
-
             }
             return BadRequest(ModelState);
         }
@@ -261,7 +293,7 @@ namespace giftcard_api.Controllers
             }
 
             // Génération du nouveau token
-            var newToken = _jwtService.GenerateToken(user);
+            var newToken = await _jwtService.GenerateToken(user);
             var newRefreshToken = _jwtService.GenerateRefreshToken();
             _jwtService.SaveRefreshToken(user, newRefreshToken);
 

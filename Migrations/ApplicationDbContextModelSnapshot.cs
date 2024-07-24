@@ -22,6 +22,43 @@ namespace giftcard_api.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("giftcard_api.Models.Beneficiary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Has_gochap")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("IdBeneficiaryWallet")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Prenom")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("ProfilePhoto")
+                        .HasColumnType("longblob");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBeneficiaryWallet");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Beneficiaries");
+                });
+
             modelBuilder.Entity("giftcard_api.Models.BeneficiaryHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -68,6 +105,40 @@ namespace giftcard_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BeneficiaryWallets");
+                });
+
+            modelBuilder.Entity("giftcard_api.Models.Merchant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdMerchantWallet")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Prenom")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<byte[]>("ProfilePhoto")
+                        .HasColumnType("longblob");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdMerchantWallet");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Merchants");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.MerchantHistory", b =>
@@ -163,6 +234,33 @@ namespace giftcard_api.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("giftcard_api.Models.Subscriber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdSubscriberWallet")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubscriberName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdSubscriberWallet");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Subscribers");
+                });
+
             modelBuilder.Entity("giftcard_api.Models.SubscriberHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -244,11 +342,6 @@ namespace giftcard_api.Migrations
                     b.Property<DateTime?>("DateInscription")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("varchar(13)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -269,116 +362,34 @@ namespace giftcard_api.Migrations
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Telephone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdRole");
 
                     b.ToTable("Users");
-
-                    b.HasDiscriminator().HasValue("User");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("giftcard_api.Models.Beneficiary", b =>
                 {
-                    b.HasBaseType("giftcard_api.Models.User");
+                    b.HasOne("giftcard_api.Models.BeneficiaryWallet", "BeneficiaryWallet")
+                        .WithMany()
+                        .HasForeignKey("IdBeneficiaryWallet")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<bool>("Has_gochap")
-                        .HasColumnType("tinyint(1)");
+                    b.HasOne("giftcard_api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("IdBeneficiaryWallet")
-                        .HasColumnType("int");
+                    b.Navigation("BeneficiaryWallet");
 
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Prenom")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<byte[]>("ProfilePhoto")
-                        .HasColumnType("longblob");
-
-                    b.HasIndex("IdBeneficiaryWallet");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("Users", t =>
-                        {
-                            t.Property("IdUser")
-                                .HasColumnName("Beneficiary_IdUser");
-
-                            t.Property("Nom")
-                                .HasColumnName("Beneficiary_Nom");
-
-                            t.Property("Prenom")
-                                .HasColumnName("Beneficiary_Prenom");
-
-                            t.Property("ProfilePhoto")
-                                .HasColumnName("Beneficiary_ProfilePhoto");
-                        });
-
-                    b.HasDiscriminator().HasValue("Beneficiary");
-                });
-
-            modelBuilder.Entity("giftcard_api.Models.Merchant", b =>
-                {
-                    b.HasBaseType("giftcard_api.Models.User");
-
-                    b.Property<int>("IdMerchantWallet")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Prenom")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<byte[]>("ProfilePhoto")
-                        .HasColumnType("longblob");
-
-                    b.HasIndex("IdMerchantWallet");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("Users", t =>
-                        {
-                            t.Property("IdUser")
-                                .HasColumnName("Merchant_IdUser");
-                        });
-
-                    b.HasDiscriminator().HasValue("Merchant");
-                });
-
-            modelBuilder.Entity("giftcard_api.Models.Subscriber", b =>
-                {
-                    b.HasBaseType("giftcard_api.Models.User");
-
-                    b.Property<int>("IdSubscriberWallet")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SubscriberName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasIndex("IdSubscriberWallet");
-
-                    b.HasIndex("IdUser");
-
-                    b.HasDiscriminator().HasValue("Subscriber");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.BeneficiaryHistory", b =>
@@ -392,6 +403,25 @@ namespace giftcard_api.Migrations
                     b.Navigation("Beneficiary");
                 });
 
+            modelBuilder.Entity("giftcard_api.Models.Merchant", b =>
+                {
+                    b.HasOne("giftcard_api.Models.MerchantWallet", "MerchantWallet")
+                        .WithMany()
+                        .HasForeignKey("IdMerchantWallet")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("giftcard_api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MerchantWallet");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("giftcard_api.Models.MerchantHistory", b =>
                 {
                     b.HasOne("giftcard_api.Models.Merchant", "Merchant")
@@ -401,6 +431,25 @@ namespace giftcard_api.Migrations
                         .IsRequired();
 
                     b.Navigation("Merchant");
+                });
+
+            modelBuilder.Entity("giftcard_api.Models.Subscriber", b =>
+                {
+                    b.HasOne("giftcard_api.Models.SubscriberWallet", "SubscriberWallet")
+                        .WithMany()
+                        .HasForeignKey("IdSubscriberWallet")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("giftcard_api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubscriberWallet");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.SubscriberHistory", b =>
@@ -446,74 +495,17 @@ namespace giftcard_api.Migrations
 
             modelBuilder.Entity("giftcard_api.Models.Beneficiary", b =>
                 {
-                    b.HasOne("giftcard_api.Models.BeneficiaryWallet", "BeneficiaryWallet")
-                        .WithMany()
-                        .HasForeignKey("IdBeneficiaryWallet")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("giftcard_api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BeneficiaryWallet");
-
-                    b.Navigation("User");
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.Merchant", b =>
                 {
-                    b.HasOne("giftcard_api.Models.MerchantWallet", "MerchantWallet")
-                        .WithMany()
-                        .HasForeignKey("IdMerchantWallet")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("giftcard_api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MerchantWallet");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("giftcard_api.Models.Subscriber", b =>
-                {
-                    b.HasOne("giftcard_api.Models.SubscriberWallet", "SubscriberWallet")
-                        .WithMany()
-                        .HasForeignKey("IdSubscriberWallet")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("giftcard_api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubscriberWallet");
-
-                    b.Navigation("User");
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.Package", b =>
                 {
                     b.Navigation("Subscribers");
-                });
-
-            modelBuilder.Entity("giftcard_api.Models.Beneficiary", b =>
-                {
-                    b.Navigation("Histories");
-                });
-
-            modelBuilder.Entity("giftcard_api.Models.Merchant", b =>
-                {
-                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("giftcard_api.Models.Subscriber", b =>

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace giftcard_api.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase
@@ -41,7 +42,7 @@ namespace giftcard_api.Controllers
             return role;
         }
 
-        [Authorize]
+
         [HttpPost]
         public async Task<ActionResult<Role>> PostRole(Role role)
         {
@@ -51,17 +52,26 @@ namespace giftcard_api.Controllers
             return CreatedAtAction(nameof(GetRole), new { id = role.Id }, role);
         }
 
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRole(int id, Role role)
         {
-            if (id != role.Id)
+            if (id <= 0)
             {
-                return BadRequest();
+                return BadRequest("Invalid ID");
             }
 
-            _context.Entry(role).State = EntityState.Modified;
+            // Cherche l'entité existante dans la base de données
+            var existingRole = await _context.Roles.FindAsync(id);
+            if (existingRole == null)
+            {
+                return NotFound();
+            }
 
+            // Met à jour uniquement les champs autorisés
+            existingRole.RoleNom = role.RoleNom;
+
+            // Marque l'entité comme modifiée
+            _context.Entry(existingRole).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -81,7 +91,7 @@ namespace giftcard_api.Controllers
             return NoContent();
         }
 
-        [Authorize]
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
@@ -101,7 +111,7 @@ namespace giftcard_api.Controllers
         {
             return _context.Roles.Any(e => e.Id == id);
         }
-        [Authorize]
+
         [HttpPut("update-user-role/{userId}/{roleId}")]
         public async Task<IActionResult> UpdateUserRole(int userId, int roleId)
         {

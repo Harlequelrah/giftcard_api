@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace giftcard_api.Migrations
 {
     /// <inheritdoc />
-    public partial class ModelController : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -105,6 +105,8 @@ namespace giftcard_api.Migrations
                     IdRole = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telephone = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Password = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RefreshToken = table.Column<string>(type: "longtext", nullable: true)
@@ -113,71 +115,108 @@ namespace giftcard_api.Migrations
                     DateInscription = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Adresse = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Discriminator = table.Column<string>(type: "varchar(13)", maxLength: 13, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Has_gochap = table.Column<bool>(type: "tinyint(1)", nullable: true),
-                    Beneficiary_IdUser = table.Column<int>(type: "int", nullable: true),
-                    IdBeneficiaryWallet = table.Column<int>(type: "int", nullable: true),
-                    Beneficiary_Nom = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Beneficiary_Prenom = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Beneficiary_ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true),
-                    Merchant_IdUser = table.Column<int>(type: "int", nullable: true),
-                    IdMerchantWallet = table.Column<int>(type: "int", nullable: true),
-                    Nom = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Prenom = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true),
-                    IdUser = table.Column<int>(type: "int", nullable: true),
-                    IdSubscriberWallet = table.Column<int>(type: "int", nullable: true),
-                    SubscriberName = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_BeneficiaryWallets_IdBeneficiaryWallet",
-                        column: x => x.IdBeneficiaryWallet,
-                        principalTable: "BeneficiaryWallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Users_MerchantWallets_IdMerchantWallet",
-                        column: x => x.IdMerchantWallet,
-                        principalTable: "MerchantWallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_Roles_IdRole",
                         column: x => x.IdRole,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Beneficiaries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Has_gochap = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IdUser = table.Column<int>(type: "int", nullable: false),
+                    IdBeneficiaryWallet = table.Column<int>(type: "int", nullable: false),
+                    Nom = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Prenom = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Beneficiaries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_SubscriberWallets_IdSubscriberWallet",
+                        name: "FK_Beneficiaries_BeneficiaryWallets_IdBeneficiaryWallet",
+                        column: x => x.IdBeneficiaryWallet,
+                        principalTable: "BeneficiaryWallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Beneficiaries_Users_IdUser",
+                        column: x => x.IdUser,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Merchants",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    IdUser = table.Column<int>(type: "int", nullable: false),
+                    IdMerchantWallet = table.Column<int>(type: "int", nullable: false),
+                    Nom = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Prenom = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Merchants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Merchants_MerchantWallets_IdMerchantWallet",
+                        column: x => x.IdMerchantWallet,
+                        principalTable: "MerchantWallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Merchants_Users_IdUser",
+                        column: x => x.IdUser,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Subscribers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    IdUser = table.Column<int>(type: "int", nullable: false),
+                    IdSubscriberWallet = table.Column<int>(type: "int", nullable: false),
+                    SubscriberName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscribers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscribers_SubscriberWallets_IdSubscriberWallet",
                         column: x => x.IdSubscriberWallet,
                         principalTable: "SubscriberWallets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Users_Users_Beneficiary_IdUser",
-                        column: x => x.Beneficiary_IdUser,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Users_Users_IdUser",
+                        name: "FK_Subscribers_Users_IdUser",
                         column: x => x.IdUser,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Users_Users_Merchant_IdUser",
-                        column: x => x.Merchant_IdUser,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -200,9 +239,9 @@ namespace giftcard_api.Migrations
                 {
                     table.PrimaryKey("PK_BeneficiaryHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BeneficiaryHistories_Users_IdBeneficiary",
+                        name: "FK_BeneficiaryHistories_Beneficiaries_IdBeneficiary",
                         column: x => x.IdBeneficiary,
-                        principalTable: "Users",
+                        principalTable: "Beneficiaries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -224,9 +263,9 @@ namespace giftcard_api.Migrations
                 {
                     table.PrimaryKey("PK_MerchantHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MerchantHistories_Users_IdMerchant",
+                        name: "FK_MerchantHistories_Merchants_IdMerchant",
                         column: x => x.IdMerchant,
-                        principalTable: "Users",
+                        principalTable: "Merchants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -248,9 +287,9 @@ namespace giftcard_api.Migrations
                 {
                     table.PrimaryKey("PK_SubscriberHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubscriberHistories_Users_IdSubscriber",
+                        name: "FK_SubscriberHistories_Subscribers_IdSubscriber",
                         column: x => x.IdSubscriber,
-                        principalTable: "Users",
+                        principalTable: "Subscribers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -274,13 +313,23 @@ namespace giftcard_api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Subscriptions_Users_IdSubscriber",
+                        name: "FK_Subscriptions_Subscribers_IdSubscriber",
                         column: x => x.IdSubscriber,
-                        principalTable: "Users",
+                        principalTable: "Subscribers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Beneficiaries_IdBeneficiaryWallet",
+                table: "Beneficiaries",
+                column: "IdBeneficiaryWallet");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Beneficiaries_IdUser",
+                table: "Beneficiaries",
+                column: "IdUser");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BeneficiaryHistories_IdBeneficiary",
@@ -293,9 +342,29 @@ namespace giftcard_api.Migrations
                 column: "IdMerchant");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Merchants_IdMerchantWallet",
+                table: "Merchants",
+                column: "IdMerchantWallet");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Merchants_IdUser",
+                table: "Merchants",
+                column: "IdUser");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubscriberHistories_IdSubscriber",
                 table: "SubscriberHistories",
                 column: "IdSubscriber");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscribers_IdSubscriberWallet",
+                table: "Subscribers",
+                column: "IdSubscriberWallet");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscribers_IdUser",
+                table: "Subscribers",
+                column: "IdUser");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_IdPackage",
@@ -303,39 +372,9 @@ namespace giftcard_api.Migrations
                 column: "IdPackage");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Beneficiary_IdUser",
-                table: "Users",
-                column: "Beneficiary_IdUser");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_IdBeneficiaryWallet",
-                table: "Users",
-                column: "IdBeneficiaryWallet");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_IdMerchantWallet",
-                table: "Users",
-                column: "IdMerchantWallet");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_IdRole",
                 table: "Users",
                 column: "IdRole");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_IdSubscriberWallet",
-                table: "Users",
-                column: "IdSubscriberWallet");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_IdUser",
-                table: "Users",
-                column: "IdUser");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_Merchant_IdUser",
-                table: "Users",
-                column: "Merchant_IdUser");
         }
 
         /// <inheritdoc />
@@ -354,10 +393,16 @@ namespace giftcard_api.Migrations
                 name: "Subscriptions");
 
             migrationBuilder.DropTable(
+                name: "Beneficiaries");
+
+            migrationBuilder.DropTable(
+                name: "Merchants");
+
+            migrationBuilder.DropTable(
                 name: "Packages");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Subscribers");
 
             migrationBuilder.DropTable(
                 name: "BeneficiaryWallets");
@@ -366,10 +411,13 @@ namespace giftcard_api.Migrations
                 name: "MerchantWallets");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "SubscriberWallets");
 
             migrationBuilder.DropTable(
-                name: "SubscriberWallets");
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

@@ -18,5 +18,7 @@ namespace giftcard_api.Data
         public string Prenom { get; set; }
         [Required]
         public bool Has_gochap { get; set; }
+        [Required]
+        public string Telephone { get; set; }
     }
 }

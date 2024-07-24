@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace giftcard_api.Models
 {
-    public class Beneficiary:User
+    public class Beneficiary
     {
         // Attributs privés
         private int _id;
