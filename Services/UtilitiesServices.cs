@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using giftcard_api.Data;
 
 
+
 namespace giftcard_api.Services
 {
     public interface IRoleService

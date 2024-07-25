@@ -32,9 +32,11 @@ namespace giftcard_api.Models
             get => _idRole;
             set => _idRole = value;
         }
-
         [ForeignKey("IdRole")]
         public Role Role { get; set; }
+
+
+
 
         public string Email
         {
@@ -46,7 +48,6 @@ namespace giftcard_api.Models
             get => _telephone;
             set => _telephone = value;
         }
-
         public string Password
         {
             get => _password;

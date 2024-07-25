@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace giftcard_api.Controllers
 {
 
+    [Authorize(Roles="ADMIN")]
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase
@@ -53,25 +54,18 @@ namespace giftcard_api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRole(int id, Role role)
+        public async Task<IActionResult> PutRole(int id, RoleDto roledto)
         {
-            if (id <= 0)
+            if ((id <= 0 ) || (id!=roledto.Id))
             {
                 return BadRequest("Invalid ID");
             }
+            var role = new Role{
+                Id = roledto.Id,
+                RoleNom = roledto.RoleNom
+            };
 
-            // Cherche l'entité existante dans la base de données
-            var existingRole = await _context.Roles.FindAsync(id);
-            if (existingRole == null)
-            {
-                return NotFound();
-            }
-
-            // Met à jour uniquement les champs autorisés
-            existingRole.RoleNom = role.RoleNom;
-
-            // Marque l'entité comme modifiée
-            _context.Entry(existingRole).State = EntityState.Modified;
+            _context.Entry(role).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -112,48 +106,6 @@ namespace giftcard_api.Controllers
             return _context.Roles.Any(e => e.Id == id);
         }
 
-        [HttpPut("update-user-role/{userId}/{roleId}")]
-        public async Task<IActionResult> UpdateUserRole(int userId, int roleId)
-        {
-            // Récupération de l'utilisateur avec l'Id spécifié
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound(); // L'utilisateur n'existe pas
-            }
 
-            // Vérification que le rôle existe
-            var role = await _context.Roles.FindAsync(roleId);
-            if (role == null)
-            {
-                return NotFound(); // Le rôle n'existe pas
-            }
-
-            // Mise à jour du champ IdRole de l'utilisateur
-            user.IdRole = roleId;
-
-            // Indiquer que l'entité User a été modifiée
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                // Sauvegarde des changements dans la base de données
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // Gestion des exceptions de concurrence
-                if (!_context.Users.Any(e => e.Id == userId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
     }
 }
