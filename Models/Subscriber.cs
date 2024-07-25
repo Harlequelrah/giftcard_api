@@ -43,7 +43,7 @@ namespace giftcard_api.Models
         [ForeignKey("IdSubscriberWallet")]
         public SubscriberWallet SubscriberWallet { get; set; }
 
-        public ICollection<Subscription> Packages { get; set; }
+        public ICollection<Subscription> SubscriberSubscriptions { get; set; }  = new HashSet<Subscription>();
         public ICollection<SubscriberHistory> Histories { get; set; } = new HashSet<SubscriberHistory>();
 
     }

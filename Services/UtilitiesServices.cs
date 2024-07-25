@@ -30,5 +30,16 @@ namespace giftcard_api.Services
             return role; // Renvoie null si aucun rôle n'est trouvé
         }
     }
+    public static class UtilityDate
+    {
+        public static string GetDate(string format = "yyyy-MM-dd HH:mm:ss")
+        {
+            return DateTime.UtcNow.ToString(format);
+        }
+
+    }
+
+
+
 
 }

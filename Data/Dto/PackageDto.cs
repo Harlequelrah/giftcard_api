@@ -1,0 +1,26 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System;
+
+namespace giftcard_api.Models
+{
+    public class PackageDto
+    {
+        [Required]
+        public string NomPackage { get; set; }
+        [Required]
+        public string Description { get; set; }
+        [Required]
+        public int NbrJour { get; set; }
+        [Required]
+        public double Budget { get; set; }
+        [Required]
+        public double Prix { get; set; }
+        public int MaxCarte { get; set; }
+        [Required]
+        public int MontantBase { get; set; }
+
+    }
+}

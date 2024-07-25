@@ -8,7 +8,7 @@ namespace giftcard_api.Models
     {
         private int _id;
         private double _montant;
-        private DateTime _date;
+        private string _date;
 
         // Propriétés publiques
         [Key]
@@ -23,8 +23,8 @@ namespace giftcard_api.Models
             get => _montant;
             set => _montant = value;
         }
-
-        public DateTime Date
+        [StringLength(50)]
+        public string Date
         {
             get => _date;
             set => _date = value;

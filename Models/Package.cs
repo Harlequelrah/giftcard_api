@@ -9,24 +9,43 @@ namespace giftcard_api.Models
     public class Package
     {
         // Attributs privés
+        private string _nomPackage;
+
         private int _id;
+        private int _nbrJour;
         private double _budget;
         private double _prix;
-        private int _maxCarte;
+        private int?  _maxCarte;
         private int _montantBase;
-        private DateTime _dateExpirations;
+        private string _description;
+
+
+
 
         // Propriété statique
-        public static int NbrCarteGenere { get; set; }
+
 
         // Propriétés publiques
-        [JsonIgnore]
+
+
+        public int NbrJour
+        {
+            get => _nbrJour;
+            set => _nbrJour = value;
+        }
+
         [Key]
         public int Id
         {
             get => _id;
             set => _id = value;
         }
+        public string NomPackage
+        {
+            get => _nomPackage;
+            set => _nomPackage = value;
+        }
+
 
         public double Budget
         {
@@ -40,7 +59,7 @@ namespace giftcard_api.Models
             set => _prix = value;
         }
 
-        public int MaxCarte
+        public int? MaxCarte
         {
             get => _maxCarte;
             set => _maxCarte = value;
@@ -51,13 +70,14 @@ namespace giftcard_api.Models
             get => _montantBase;
             set => _montantBase = value;
         }
-
-        public DateTime DateExpirations
+        public string Description
         {
-            get => _dateExpirations;
-            set => _dateExpirations = value;
+            get => _description;
+            set => _description = value;
         }
 
-        public ICollection<Subscription> Subscribers { get; set; } = new HashSet<Subscription>();
+
+
+        public ICollection<Subscription> PackageSubscriptions { get; set; } = new HashSet<Subscription>();
     }
 }

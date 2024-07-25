@@ -55,7 +55,7 @@ namespace giftcard_api.Controllers
                         Password = hashedPassword,
                         Adresse = userdto.Adresse,
                         Telephone = userdto.Telephone,
-                        DateInscription = DateTime.UtcNow,
+                        DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
                         // Ajouter d'autres propriétés si nécessaire
@@ -102,7 +102,7 @@ namespace giftcard_api.Controllers
                         Password = hashedPassword,
                         Adresse = subscriberdto.Adresse,
                         Telephone = subscriberdto.Telephone,
-                        DateInscription = DateTime.UtcNow,
+                        DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
                         // Ajouter d'autres propriétés si nécessaire
@@ -124,7 +124,7 @@ namespace giftcard_api.Controllers
                     {
                         IdSubscriber = subscriber.Id,
                         Montant = 0.0,
-                        Date = DateTime.UtcNow,
+                        Date = UtilityDate.GetDate(),
                         Action = SubscriberHistory.SubscriberActions.Initial,
                     };
                     _context.SubscriberHistories.Add(subscriberHistory);
@@ -168,7 +168,7 @@ namespace giftcard_api.Controllers
                         Password = hashedPassword,
                         Adresse = merchantdto.Adresse,
                         Telephone = merchantdto.Telephone,
-                        DateInscription = DateTime.UtcNow,
+                        DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
                         // Ajouter d'autres propriétés si nécessaire
@@ -191,7 +191,7 @@ namespace giftcard_api.Controllers
                     {
                         IdMerchant = merchant.Id,
                         Montant = 0.0,
-                        Date = DateTime.UtcNow,
+                        Date = UtilityDate.GetDate(),
                         Action = MerchantHistory.MerchantActions.Initial,
                     };
                     _context.MerchantHistories.Add(merchantHistory);
@@ -236,7 +236,7 @@ namespace giftcard_api.Controllers
                         Password = hashedPassword,
                         Adresse = beneficiarydto.Adresse,
                         Telephone = beneficiarydto.Telephone,
-                        DateInscription = DateTime.UtcNow,
+                        DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
                         // Ajouter d'autres propriétés si nécessaire
@@ -263,7 +263,7 @@ namespace giftcard_api.Controllers
                         {
                             IdBeneficiary = beneficiary.Id,
                             Montant = 0.0,
-                            Date = DateTime.UtcNow,
+                            Date = UtilityDate.GetDate(),
                             Action = BeneficiaryHistory.BeneficiaryActions.Initial,
                         };
                         _context.BeneficiaryHistories.Add(beneficiaryHistory);

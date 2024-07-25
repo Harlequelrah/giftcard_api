@@ -4,10 +4,12 @@ using giftcard_api.Models;
 using giftcard_api.Data;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     [Route("api/[controller]")]
     [ApiController]
     public class PackageController : ControllerBase
@@ -19,14 +21,12 @@ namespace giftcard_api.Controllers
             _context = context;
         }
 
-        // GET: api/Package
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Package>>> GetPackages()
         {
             return await _context.Packages.ToListAsync();
         }
 
-        // GET: api/Package/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Package>> GetPackage(int id)
         {
@@ -40,17 +40,26 @@ namespace giftcard_api.Controllers
             return package;
         }
 
-        // POST: api/Package
         [HttpPost]
-        public async Task<ActionResult<Package>> PostPackage(Package package)
+        public async Task<ActionResult<Package>> PostPackage(PackageDto packagedto)
         {
+            var package = new Package
+            {
+                NomPackage= packagedto.NomPackage,
+                Budget= packagedto.Budget,
+                Prix= packagedto.Prix,
+                MontantBase= packagedto.MontantBase,
+                MaxCarte= packagedto.MaxCarte,
+                NbrJour= packagedto.NbrJour,
+                Description= packagedto.Description,
+            };
             _context.Packages.Add(package);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetPackage), new { id = package.Id }, package);
         }
 
-        // PUT: api/Package/5
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPackage(int id, Package package)
         {
@@ -80,7 +89,6 @@ namespace giftcard_api.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Package/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePackage(int id)
         {

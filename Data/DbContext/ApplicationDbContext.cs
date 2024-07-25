@@ -51,12 +51,12 @@ namespace giftcard_api.Data
 
             modelBuilder.Entity<Subscription>()
                 .HasOne(pa => pa.Subscriber)
-                .WithMany(p => p.Packages)
+                .WithMany(p => p.SubscriberSubscriptions)
                 .HasForeignKey(pa => pa.IdSubscriber);
 
             modelBuilder.Entity<Subscription>()
                 .HasOne(pa => pa.Package)
-                .WithMany(a => a.Subscribers)
+                .WithMany(a => a.PackageSubscriptions)
                 .HasForeignKey(pa => pa.IdPackage);
         }
 

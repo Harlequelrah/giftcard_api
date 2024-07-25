@@ -11,13 +11,20 @@ namespace giftcard_api.Models
         // Attributs privés
         private int _idPackage;
         private int _idSubscriber;
-        private DateTime _dateSouscription;
+        private string _dateSouscription;
+        private int? _nbrCarteGenere;
+        private DateTime _dateExpiration;
 
         // Propriétés publiques
         public int IdPackage
         {
             get => _idPackage;
             set => _idPackage = value;
+        }
+        public int? NbrCarteGenere
+        {
+            get => _nbrCarteGenere;
+            set => _nbrCarteGenere = value;
         }
 
         public int IdSubscriber
@@ -32,10 +39,17 @@ namespace giftcard_api.Models
         [ForeignKey("IdSubscriber")]
         public Subscriber Subscriber { get; set; }
 
-        public DateTime DateSouscription
+
+        [StringLength(50)]
+        public string DateSouscription
         {
             get => _dateSouscription;
             set => _dateSouscription = value;
+        }
+        public DateTime DateExpiration
+        {
+            get => _dateExpiration;
+            set => _dateExpiration = value;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace giftcard_api.Models
         private string _telephone;
         private string? _refreshToken;
         private DateTime? _refreshTokenExpiryTime;
-        private DateTime? _dateInscription;
+        private string? _dateInscription;
         private string _adresse;
         private bool _isActive = true;
 
@@ -65,8 +65,8 @@ namespace giftcard_api.Models
             get => _refreshTokenExpiryTime;
             set => _refreshTokenExpiryTime = value;
         }
-
-        public DateTime? DateInscription
+        [StringLength(50)]
+        public string? DateInscription
         {
             get => _dateInscription;
             set => _dateInscription = value;
