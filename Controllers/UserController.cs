@@ -27,6 +27,7 @@ namespace giftcard_api.Controllers
             _configuration = configuration;
             _jwtService = jwtService;
         }
+
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/admin")]
         public async Task<IActionResult> RegisterAdmin(UserDto userdto)
@@ -51,6 +52,54 @@ namespace giftcard_api.Controllers
                     var user = new User
                     {
                         IdRole = 4,
+                        Email = userdto.Email,
+                        Password = hashedPassword,
+                        Adresse = userdto.Adresse,
+                        Telephone = userdto.Telephone,
+                        DateInscription = UtilityDate.GetDate(),
+                        RefreshToken = _jwtService.GenerateRefreshToken(),
+                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
+                        // Ajouter d'autres propriétés si nécessaire
+                    };
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+
+
+                    string token = await _jwtService.GenerateToken(user);
+                    return Ok(new { Token = token });
+                }
+                catch (Exception ex)
+                {
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("register/user")]
+        public async Task<IActionResult> RegisterUser(UserDto userdto)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Vérifiez si l'utilisateur existe déjà
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userdto.Email);
+                    if (existingUser != null)
+                    {
+                        return BadRequest(new
+                        {
+                            errors = new Dictionary<string, string[]>
+                        {
+                            { "email", new[] { "Ce Email est déjà utilisé." } }
+                        }
+                        });
+                    }
+                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userdto.Password);
+                    var user = new User
+                    {
+                        IdRole = null,
                         Email = userdto.Email,
                         Password = hashedPassword,
                         Adresse = userdto.Adresse,
@@ -216,18 +265,7 @@ namespace giftcard_api.Controllers
             {
                 try
                 {
-                    // Vérifiez si l'utilisateur existe déjà
-                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
-                    if (existingUser != null)
-                    {
-                        return BadRequest(new
-                        {
-                            errors = new Dictionary<string, string[]>
-                        {
-                            { "email", new[] { "Ce Email est déjà utilisé." } }
-                        }
-                        });
-                    }
+
                     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(beneficiarydto.Password);
                     var user = new User
                     {
@@ -245,13 +283,24 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
                     if (beneficiarydto.Has_gochap)
                     {
+                        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
+                        if (existingUser != null)
+                        {
+                            return BadRequest(new
+                            {
+                                errors = new Dictionary<string, string[]>
+                        {
+                            { "email", new[] { "Ce Email est déjà utilisé." } }
+                        }
+                            });
+                        }
                         var beneficiaryWallet = new BeneficiaryWallet();
                         _context.BeneficiaryWallets.Add(beneficiaryWallet);
                         await _context.SaveChangesAsync();
                         var beneficiary = new Beneficiary
                         {
                             IdSubscriber = beneficiarydto.IdSubscriber,
-                            IdUser = user.Id,
+                            IdUser = existingUser.Id,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
@@ -278,16 +327,15 @@ namespace giftcard_api.Controllers
                     {
                         var beneficiary = new Beneficiary
                         {
-                            IdUser = user.Id,
+                            IdUser = null,
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();
-                        await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateToken(user);
-                        return Ok(new { Token = token, user, beneficiary });
+                        return Ok(new { Token = token, beneficiary });
                     }
                 }
                 catch (Exception ex)

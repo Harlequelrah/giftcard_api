@@ -25,7 +25,7 @@ namespace giftcard_api.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            string RoleName = await _roleService.GetRoleNameByIdAsync(user.IdRole);
+            string RoleName = user.IdRole==null? "UTILISATEUR" : await _roleService.GetRoleNameByIdAsync(user.IdRole);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

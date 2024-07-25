@@ -8,7 +8,7 @@ namespace giftcard_api.Services
 {
     public interface IRoleService
     {
-        Task<string> GetRoleNameByIdAsync(int idRole);
+        Task<string> GetRoleNameByIdAsync(int? idRole);
     }
 
     public class RoleService : IRoleService
@@ -20,7 +20,7 @@ namespace giftcard_api.Services
             _context = context;
         }
 
-        public async Task<string> GetRoleNameByIdAsync(int idRole)
+        public async Task<string> GetRoleNameByIdAsync(int? idRole)
         {
             var role = await _context.Roles
                 .Where(r => r.Id == idRole)

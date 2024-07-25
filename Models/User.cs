@@ -9,7 +9,7 @@ namespace giftcard_api.Models
     {
         // Attributs privés
         private int _id;
-        private int _idRole;
+        private int? _idRole;
         private string _email;
         private string _password;
         private string _telephone;
@@ -27,13 +27,13 @@ namespace giftcard_api.Models
             set => _id = value;
         }
 
-        public int IdRole
+        public int? IdRole
         {
             get => _idRole;
             set => _idRole = value;
         }
         [ForeignKey("IdRole")]
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
 
 
 

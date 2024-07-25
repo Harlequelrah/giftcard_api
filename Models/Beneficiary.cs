@@ -9,7 +9,7 @@ namespace giftcard_api.Models
     {
         // Attributs privés
         private int _id;
-        private int _idUser;
+        private int? _idUser = null;
         private int _idSubscriber;
         private int _idBeneficiaryWallet;
         private string _nom;
@@ -31,7 +31,7 @@ namespace giftcard_api.Models
             set => _has_gochap = value;
         }
 
-        public int IdUser
+        public int? IdUser
         {
             get => _idUser;
             set => _idUser = value;
