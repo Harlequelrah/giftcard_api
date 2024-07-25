@@ -95,7 +95,7 @@ namespace giftcard_api.Controllers
 
             _context.SubscriberHistories.Add(subscriberhistory);
             await _context.SaveChangesAsync();
-            SubscriberWallet subscriberwallet=subscriber.Subscriberwallet;
+            SubscriberWallet subscriberwallet=subscriber.SubscriberWallet;
             subscriberwallet.Solde += package.Budget;
 
             _context.Entry(subscriberwallet).State = EntityState.Modified;
