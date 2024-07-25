@@ -59,6 +59,7 @@ namespace giftcard_api.Models
             Initial,
             Enregistrement,
             Souscription,
+            PackageExpiration,
         }
         private int _idSubscriber;
         public int IdSubscriber { get => _idSubscriber; set => _idSubscriber = value; }

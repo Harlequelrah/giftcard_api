@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using giftcard_api.Data;
 
@@ -11,9 +12,11 @@ using giftcard_api.Data;
 namespace giftcard_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240725172202_montantbasetypedouble")]
+    partial class montantbasetypedouble
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -214,7 +217,7 @@ namespace giftcard_api.Migrations
                     b.Property<double>("MontantBase")
                         .HasColumnType("double");
 
-                    b.Property<int?>("NbrJour")
+                    b.Property<int>("NbrJour")
                         .HasColumnType("int");
 
                     b.Property<string>("NomPackage")
@@ -331,7 +334,7 @@ namespace giftcard_api.Migrations
                     b.Property<int>("IdPackage")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DateExpiration")
+                    b.Property<DateTime>("DateExpiration")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("DateSouscription")

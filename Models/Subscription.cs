@@ -12,8 +12,8 @@ namespace giftcard_api.Models
         private int _idPackage;
         private int _idSubscriber;
         private string _dateSouscription;
-        private int? _nbrCarteGenere;
-        private DateTime _dateExpiration;
+        private int? _nbrCarteGenere=0;
+        private DateTime? _dateExpiration;
 
         // Propriétés publiques
         public int IdPackage
@@ -46,7 +46,7 @@ namespace giftcard_api.Models
             get => _dateSouscription;
             set => _dateSouscription = value;
         }
-        public DateTime DateExpiration
+        public DateTime? DateExpiration
         {
             get => _dateExpiration;
             set => _dateExpiration = value;

@@ -21,14 +21,14 @@ namespace giftcard_api.Controllers
             _context = context;
         }
 
-        // Get: api/Subscription
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptions()
         {
             return await _context.Subscriptions.ToListAsync();
         }
 
-        // Get: api/Subscription/Subscriber/{subscriberId}
+
         [HttpGet("Subscriber/{subscriberId}")]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptionsBySubscriber(int subscriberId)
         {
@@ -37,7 +37,7 @@ namespace giftcard_api.Controllers
                                  .ToListAsync();
         }
 
-        // Get: api/Subscription/Package/{packageId}
+
         [HttpGet("Package/{packageId}")]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptionsByPackage(int packageId)
         {
@@ -61,7 +61,7 @@ namespace giftcard_api.Controllers
             return subscription;
         }
 
-        // Post: api/Subscription
+
         [HttpPost]
         public async Task<ActionResult<Subscription>> PostSubscription(SubscriptionDto subscriptiondto)
         {
@@ -75,30 +75,39 @@ namespace giftcard_api.Controllers
             {
                 return NotFound("Subscriber not found");
             }
+
             var subscription = new Subscription
             {
                 IdSubscriber = subscriptiondto.IdSubscriber,
                 IdPackage = subscriptiondto.IdPackage,
                 DateSouscription = UtilityDate.GetDate(),
-                DateExpiration = DateTime.UtcNow.AddDays(package.NbrJour),
+                DateExpiration = package.NbrJour.HasValue ? DateTime.UtcNow.AddDays(package.NbrJour.Value) : (DateTime?)null
+
             };
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
 
             var subscriberhistory = new SubscriberHistory
             {
-                Action=SubscriberHistory.SubscriberActions.Souscription,
-                IdSubscriber=subscriptiondto.IdSubscriber,
+                Action = SubscriberHistory.SubscriberActions.Souscription,
+                IdSubscriber = subscriptiondto.IdSubscriber,
                 Montant = subscription.Package.Budget,
                 Date = UtilityDate.GetDate(),
             };
 
             _context.SubscriberHistories.Add(subscriberhistory);
             await _context.SaveChangesAsync();
-            SubscriberWallet subscriberwallet=subscriber.SubscriberWallet;
-            subscriberwallet.Solde += package.Budget;
+            var wallet = await _context.SubscriberWallets.FindAsync(subscriber.IdSubscriberWallet);
+            if (wallet == null)
+            {
+                return NotFound("Wallet not found");
+            }
+            var nouveausolde = wallet.Solde + package.Budget;
+            wallet.Solde = nouveausolde;
+             _context.Entry(wallet).State = EntityState.Modified;
 
-            _context.Entry(subscriberwallet).State = EntityState.Modified;
+
+            // _context.Entry(subscriberwallet).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
 
@@ -106,7 +115,7 @@ namespace giftcard_api.Controllers
             return CreatedAtAction("GetSubscription", new { subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
         }
 
-        // Put: api/Subscription/{subscriberId}/{packageId}
+
         [HttpPut("{subscriberId}/{packageId}")]
         public async Task<IActionResult> PutSubscription(int subscriberId, int packageId, Subscription subscription)
         {
@@ -136,7 +145,7 @@ namespace giftcard_api.Controllers
             return NoContent();
         }
 
-        // Delete: api/Subscription/{subscriberId}/{packageId}
+
         [HttpDelete("{subscriberId}/{packageId}")]
         public async Task<IActionResult> DeleteSubscription(int subscriberId, int packageId)
         {

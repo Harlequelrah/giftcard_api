@@ -12,15 +12,15 @@ namespace giftcard_api.Models
         public string NomPackage { get; set; }
         [Required]
         public string Description { get; set; }
-        [Required]
-        public int NbrJour { get; set; }
+
+        public int? NbrJour { get; set; } = null ;
         [Required]
         public double Budget { get; set; }
         [Required]
         public double Prix { get; set; }
-        public int MaxCarte { get; set; }
+        public int? MaxCarte { get; set; } = null ;
         [Required]
-        public int MontantBase { get; set; }
+        public double MontantBase { get; set; }
 
-    }
+}
 }

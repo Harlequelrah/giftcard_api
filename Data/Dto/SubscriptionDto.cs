@@ -10,9 +10,12 @@ namespace giftcard_api.Models
     public class SubscriptionDto
     {
 
-        // Propriétés publiques
+        [Required]
         public int IdPackage { get; set; }
+        [JsonIgnore]
+        public int? NbrCarteGenere { get; set; } = 0;
 
+        [Required]
         public int IdSubscriber { get; set; }
 
     }

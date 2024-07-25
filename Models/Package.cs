@@ -12,11 +12,11 @@ namespace giftcard_api.Models
         private string _nomPackage;
 
         private int _id;
-        private int _nbrJour;
+        private int? _nbrJour=null;
         private double _budget;
         private double _prix;
-        private int?  _maxCarte;
-        private int _montantBase;
+        private int? _maxCarte=null;
+        private double _montantBase;
         private string _description;
 
 
@@ -28,11 +28,7 @@ namespace giftcard_api.Models
         // Propriétés publiques
 
 
-        public int NbrJour
-        {
-            get => _nbrJour;
-            set => _nbrJour = value;
-        }
+
 
         [Key]
         public int Id
@@ -44,6 +40,11 @@ namespace giftcard_api.Models
         {
             get => _nomPackage;
             set => _nomPackage = value;
+        }
+        public int?  NbrJour
+        {
+            get => _nbrJour;
+            set => _nbrJour = value;
         }
 
 
@@ -65,7 +66,7 @@ namespace giftcard_api.Models
             set => _maxCarte = value;
         }
 
-        public int MontantBase
+        public double MontantBase
         {
             get => _montantBase;
             set => _montantBase = value;
