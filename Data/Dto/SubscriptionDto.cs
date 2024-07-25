@@ -17,6 +17,7 @@ namespace giftcard_api.Models
 
         [Required]
         public int IdSubscriber { get; set; }
+        public double? MontantParCarte { get; set; } = null;
 
     }
 }

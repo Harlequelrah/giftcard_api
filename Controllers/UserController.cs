@@ -250,7 +250,7 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var beneficiary = new Beneficiary
                         {
-
+                            IdSubscriber = beneficiarydto.IdSubscriber,
                             IdUser = user.Id,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
@@ -390,7 +390,7 @@ namespace giftcard_api.Controllers
             if (isActive) Console.WriteLine("actif");
             else Console.WriteLine("inactif");
             var usersByActivity = await _context.Users
-                                            .Where(user => user.IsActive == isActive )
+                                            .Where(user => user.IsActive == isActive)
                                             .ToListAsync();
 
             if (usersByActivity == null || !usersByActivity.Any())

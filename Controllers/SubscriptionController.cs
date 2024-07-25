@@ -80,6 +80,7 @@ namespace giftcard_api.Controllers
             {
                 IdSubscriber = subscriptiondto.IdSubscriber,
                 IdPackage = subscriptiondto.IdPackage,
+                MontantParCarte=subscriptiondto.MontantParCarte,
                 DateSouscription = UtilityDate.GetDate(),
                 DateExpiration = package.NbrJour.HasValue ? DateTime.UtcNow.AddDays(package.NbrJour.Value) : (DateTime?)null
 
@@ -104,10 +105,8 @@ namespace giftcard_api.Controllers
             }
             var nouveausolde = wallet.Solde + package.Budget;
             wallet.Solde = nouveausolde;
-             _context.Entry(wallet).State = EntityState.Modified;
+            _context.Entry(wallet).State = EntityState.Modified;
 
-
-            // _context.Entry(subscriberwallet).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
 

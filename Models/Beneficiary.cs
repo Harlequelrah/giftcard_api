@@ -10,6 +10,7 @@ namespace giftcard_api.Models
         // Attributs privés
         private int _id;
         private int _idUser;
+        private int _idSubscriber;
         private int _idBeneficiaryWallet;
         private string _nom;
         private string _prenom;
@@ -34,6 +35,11 @@ namespace giftcard_api.Models
         {
             get => _idUser;
             set => _idUser = value;
+        }
+        public int IdSubscriber
+        {
+            get => _idSubscriber;
+            set => _idSubscriber = value;
         }
 
         public int IdBeneficiaryWallet
