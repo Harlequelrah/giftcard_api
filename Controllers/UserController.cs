@@ -247,7 +247,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
 
                     var token = await _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token, user, merchant, merchantWallet, merchantHistory });
+                    return Ok(new { Token = token, merchant, merchantWallet, merchantHistory });
                 }
                 catch (Exception ex)
                 {
@@ -378,7 +378,7 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateToken(existingUser);
 
-                        return Ok(new { Token = token, existingUser, beneficiary });
+                        return Ok(new { Token = token,  beneficiary });
 
                     }
                     else

@@ -72,15 +72,6 @@ namespace giftcard_api.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<ActionResult<Merchant>> PostMerchant(Merchant merchant)
-        {
-            _context.Merchants.Add(merchant);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMerchant", new { id = merchant.Id }, merchant);
-        }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMerchant(int id)
