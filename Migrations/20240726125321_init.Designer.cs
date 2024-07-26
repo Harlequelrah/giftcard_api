@@ -12,7 +12,7 @@ using giftcard_api.Data;
 namespace giftcard_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240726122103_init")]
+    [Migration("20240726125321_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -331,11 +331,11 @@ namespace giftcard_api.Migrations
 
             modelBuilder.Entity("giftcard_api.Models.Subscription", b =>
                 {
-                    b.Property<int>("IdSubscriber")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("IdPackage")
-                        .HasColumnType("int");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("BudgetRestant")
                         .HasColumnType("double");
@@ -348,15 +348,23 @@ namespace giftcard_api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int>("IdPackage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdSubscriber")
+                        .HasColumnType("int");
+
                     b.Property<double?>("MontantParCarte")
                         .HasColumnType("double");
 
                     b.Property<int?>("NbrCarteGenere")
                         .HasColumnType("int");
 
-                    b.HasKey("IdSubscriber", "IdPackage");
+                    b.HasKey("Id");
 
                     b.HasIndex("IdPackage");
+
+                    b.HasIndex("IdSubscriber");
 
                     b.ToTable("Subscriptions");
                 });

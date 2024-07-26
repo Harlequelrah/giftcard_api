@@ -45,8 +45,6 @@ namespace giftcard_api.Data
                     b => b.ToString(),
                     b => (BeneficiaryHistory.BeneficiaryActions)Enum.Parse(typeof(BeneficiaryHistory.BeneficiaryActions), b));
 
-            modelBuilder.Entity<Subscription>()
-                .HasKey(pk => new { pk.IdSubscriber, pk.IdPackage });
 
 
             modelBuilder.Entity<Subscription>()

@@ -306,10 +306,12 @@ namespace giftcard_api.Migrations
                 name: "Subscriptions",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IdPackage = table.Column<int>(type: "int", nullable: false),
-                    IdSubscriber = table.Column<int>(type: "int", nullable: false),
                     NbrCarteGenere = table.Column<int>(type: "int", nullable: true),
                     BudgetRestant = table.Column<double>(type: "double", nullable: false),
+                    IdSubscriber = table.Column<int>(type: "int", nullable: false),
                     DateSouscription = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateExpiration = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -317,7 +319,7 @@ namespace giftcard_api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subscriptions", x => new { x.IdSubscriber, x.IdPackage });
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Subscriptions_Packages_IdPackage",
                         column: x => x.IdPackage,
@@ -382,6 +384,11 @@ namespace giftcard_api.Migrations
                 name: "IX_Subscriptions_IdPackage",
                 table: "Subscriptions",
                 column: "IdPackage");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_IdSubscriber",
+                table: "Subscriptions",
+                column: "IdSubscriber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_IdRole",

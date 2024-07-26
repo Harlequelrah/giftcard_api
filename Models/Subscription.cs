@@ -8,7 +8,7 @@ namespace giftcard_api.Models
 {
     public class Subscription
     {
-        // Attributs privés
+        private int _id;
         private int _idPackage;
         private int _idSubscriber;
         private string _dateSouscription;
@@ -18,6 +18,13 @@ namespace giftcard_api.Models
         private DateTime? _dateExpiration;
 
         // Propriétés publiques
+
+        [Key]
+        public int Id
+        {
+            get => _id;
+            set => _id = value;
+        }
         public int IdPackage
         {
             get => _idPackage;
