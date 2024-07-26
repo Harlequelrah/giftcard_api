@@ -7,6 +7,7 @@ namespace giftcard_api.Models
 {
     public class UserDto
     {
+        [EmailAddress]
         [Required]
         public string Email { get; set; }
         [Required]

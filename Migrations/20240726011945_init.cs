@@ -53,11 +53,15 @@ namespace giftcard_api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    NomPackage = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NbrJour = table.Column<int>(type: "int", nullable: true),
                     Budget = table.Column<double>(type: "double", nullable: false),
                     Prix = table.Column<double>(type: "double", nullable: false),
-                    MaxCarte = table.Column<int>(type: "int", nullable: false),
-                    MontantBase = table.Column<int>(type: "int", nullable: false),
-                    DateExpirations = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    MaxCarte = table.Column<int>(type: "int", nullable: true),
+                    MontantBase = table.Column<double>(type: "double", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -102,7 +106,7 @@ namespace giftcard_api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    IdRole = table.Column<int>(type: "int", nullable: false),
+                    IdRole = table.Column<int>(type: "int", nullable: true),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Telephone = table.Column<string>(type: "longtext", nullable: false)
@@ -112,7 +116,8 @@ namespace giftcard_api.Migrations
                     RefreshToken = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    DateInscription = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DateInscription = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Adresse = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -124,8 +129,7 @@ namespace giftcard_api.Migrations
                         name: "FK_Users_Roles_IdRole",
                         column: x => x.IdRole,
                         principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -136,7 +140,8 @@ namespace giftcard_api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Has_gochap = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    IdUser = table.Column<int>(type: "int", nullable: false),
+                    IdUser = table.Column<int>(type: "int", nullable: true),
+                    IdSubscriber = table.Column<int>(type: "int", nullable: false),
                     IdBeneficiaryWallet = table.Column<int>(type: "int", nullable: false),
                     Nom = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -157,8 +162,7 @@ namespace giftcard_api.Migrations
                         name: "FK_Beneficiaries_Users_IdUser",
                         column: x => x.IdUser,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -233,7 +237,8 @@ namespace giftcard_api.Migrations
                     Action = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Montant = table.Column<double>(type: "double", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Date = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -257,7 +262,8 @@ namespace giftcard_api.Migrations
                     Action = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Montant = table.Column<double>(type: "double", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Date = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -281,7 +287,8 @@ namespace giftcard_api.Migrations
                     Action = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Montant = table.Column<double>(type: "double", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Date = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -301,7 +308,12 @@ namespace giftcard_api.Migrations
                 {
                     IdPackage = table.Column<int>(type: "int", nullable: false),
                     IdSubscriber = table.Column<int>(type: "int", nullable: false),
-                    DateSouscription = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    NbrCarteGenere = table.Column<int>(type: "int", nullable: true),
+                    BudgetRestant = table.Column<double>(type: "double", nullable: false),
+                    DateSouscription = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DateExpiration = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    MontantParCarte = table.Column<double>(type: "double", nullable: true)
                 },
                 constraints: table =>
                 {

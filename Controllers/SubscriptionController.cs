@@ -81,6 +81,7 @@ namespace giftcard_api.Controllers
                 IdSubscriber = subscriptiondto.IdSubscriber,
                 IdPackage = subscriptiondto.IdPackage,
                 MontantParCarte=subscriptiondto.MontantParCarte,
+                BudgetRestant=package.Budget,
                 DateSouscription = UtilityDate.GetDate(),
                 DateExpiration = package.NbrJour.HasValue ? DateTime.UtcNow.AddDays(package.NbrJour.Value) : (DateTime?)null
 

@@ -258,48 +258,92 @@ namespace giftcard_api.Controllers
 
             return BadRequest(ModelState);
         }
-        [HttpPost("register/beneficiary")]
-        public async Task<IActionResult> RegisterBeneficiary(BeneficiaryDto beneficiarydto)
+        [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}/withpackage/{idpackage}")]
+        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, int idpackage, BeneficiaryDto beneficiarydto)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-
-                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(beneficiarydto.Password);
-                    var user = new User
+                    var subscription = await _context.Subscriptions
+                        .Include(s => s.Package)
+                        .Include(s => s.Subscriber)
+                            .ThenInclude(sub => sub.SubscriberWallet)
+                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == idpackage);
+                    if (subscription == null)
                     {
-                        IdRole = 1,
-                        Email = beneficiarydto.Email,
-                        Password = hashedPassword,
-                        Adresse = beneficiarydto.Adresse,
-                        Telephone = beneficiarydto.Telephone,
-                        DateInscription = UtilityDate.GetDate(),
-                        RefreshToken = _jwtService.GenerateRefreshToken(),
-                        RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                        // Ajouter d'autres propriétés si nécessaire
+                        return NotFound("Subscription Not Found");
+                    }
+                    var package = subscription.Package;
+                    if (package == null)
+                    {
+                        return NotFound("Package Not Found");
+                    }
+                    var cartecadeau = subscription.MontantParCarte == null ? package.MontantBase : subscription.MontantParCarte;
+                    if (subscription.BudgetRestant - cartecadeau < 0)
+                    {
+                        return BadRequest("Le budget restant n'est pas suffisant pour générer une carte de cadeau");
+                    }
+                    if (DateTime.UtcNow >= subscription.DateExpiration)
+                    {
+                        return BadRequest("La souscription est  expirée");
+                    }
+                    if ( subscription.NbrCarteGenere + 1 > (package.MaxCarte ?? 0))
+                    {
+                        return BadRequest("Le nombre de carte a atteint la limite ");
+                    }
+
+                    subscription.NbrCarteGenere++;
+                    subscription.BudgetRestant -= (double)cartecadeau;
+                    _context.Entry(subscription).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+
+                    var subscriber = subscription.Subscriber;
+                    if (subscriber == null)
+                    {
+                        return NotFound("Subscriber Not Found");
+                    }
+
+                    var wallet = subscriber.SubscriberWallet;
+                    if (wallet == null)
+                    {
+                        return NotFound("SubscriberWallet Not Found");
+                    }
+
+                    var nouveausolde = wallet.Solde - cartecadeau;
+                    wallet.Solde = nouveausolde ?? 0.0;
+                    _context.Entry(wallet).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+
+                    var subscriberHistory = new SubscriberHistory
+                    {
+                        IdSubscriber = subscriber.Id,
+                        Montant = cartecadeau ?? 0.0,
+                        Date = UtilityDate.GetDate(),
+                        Action = SubscriberHistory.SubscriberActions.Enregistrement,
                     };
-                    _context.Users.Add(user);
+                    _context.SubscriberHistories.Add(subscriberHistory);
                     await _context.SaveChangesAsync();
                     if (beneficiarydto.Has_gochap)
                     {
                         var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
-                        if (existingUser != null)
+                        if (existingUser == null)
                         {
-                            return BadRequest(new
-                            {
-                                errors = new Dictionary<string, string[]>
-                        {
-                            { "email", new[] { "Ce Email est déjà utilisé." } }
+                            return NotFound("Utilisateur Non trouvé");
                         }
-                            });
-                        }
+                        existingUser.IdRole = 1;
+                        _context.Entry(existingUser).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+
+
                         var beneficiaryWallet = new BeneficiaryWallet();
                         _context.BeneficiaryWallets.Add(beneficiaryWallet);
                         await _context.SaveChangesAsync();
+
                         var beneficiary = new Beneficiary
                         {
-                            IdSubscriber = beneficiarydto.IdSubscriber,
+                            IdSubscriber = idsubscriber,
                             IdUser = existingUser.Id,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
@@ -308,6 +352,7 @@ namespace giftcard_api.Controllers
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();
+
                         var beneficiaryHistory = new BeneficiaryHistory
                         {
                             IdBeneficiary = beneficiary.Id,
@@ -318,9 +363,22 @@ namespace giftcard_api.Controllers
                         _context.BeneficiaryHistories.Add(beneficiaryHistory);
                         await _context.SaveChangesAsync();
 
+                        var beneficiaryHistory2 = new BeneficiaryHistory
+                        {
+                            IdBeneficiary = beneficiary.Id,
+                            Montant = cartecadeau ?? 0.0,
+                            Date = UtilityDate.GetDate(),
+                            Action = BeneficiaryHistory.BeneficiaryActions.Recharge,
+                        };
+                        _context.BeneficiaryHistories.Add(beneficiaryHistory2);
+                        await _context.SaveChangesAsync();
+                        var rechargebeneficiarywallet = beneficiary.BeneficiaryWallet;
+                        rechargebeneficiarywallet.Solde = rechargebeneficiarywallet.Solde + (double)cartecadeau;
+                        _context.Entry(rechargebeneficiarywallet).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        var token = await _jwtService.GenerateToken(existingUser);
 
-                        var token = await _jwtService.GenerateToken(user);
-                        return Ok(new { Token = token, user, beneficiary, beneficiaryWallet, beneficiaryHistory });
+                        return Ok(new { Token = token, existingUser, beneficiary });
 
                     }
                     else
@@ -332,11 +390,9 @@ namespace giftcard_api.Controllers
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
                         };
-                        _context.Beneficiaries.Add(beneficiary);
-                        await _context.SaveChangesAsync();
-                        var token = await _jwtService.GenerateToken(user);
-                        return Ok(new { Token = token, beneficiary });
+                        return Ok(new { beneficiary, Montant = cartecadeau });
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -410,16 +466,17 @@ namespace giftcard_api.Controllers
             public string RefreshToken { get; set; }
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-        [Authorize]
+        // [Authorize]
         [HttpGet("byrole/{idRole}")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int idRole)
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int? idRole)
         {
+            if (idRole == 0) idRole = null;
             var usersByRole = await _context.Users
                                             .Where(user => user.IdRole == idRole)
                                             .ToListAsync();
@@ -435,8 +492,6 @@ namespace giftcard_api.Controllers
         [HttpGet("byactiviy/{isActive}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByActivity(bool isActive)
         {
-            if (isActive) Console.WriteLine("actif");
-            else Console.WriteLine("inactif");
             var usersByActivity = await _context.Users
                                             .Where(user => user.IsActive == isActive)
                                             .ToListAsync();

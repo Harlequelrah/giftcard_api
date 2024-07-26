@@ -334,6 +334,9 @@ namespace giftcard_api.Migrations
                     b.Property<int>("IdPackage")
                         .HasColumnType("int");
 
+                    b.Property<double>("BudgetRestant")
+                        .HasColumnType("double");
+
                     b.Property<DateTime?>("DateExpiration")
                         .HasColumnType("datetime(6)");
 

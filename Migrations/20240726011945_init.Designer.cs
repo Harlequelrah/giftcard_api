@@ -12,8 +12,8 @@ using giftcard_api.Data;
 namespace giftcard_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240725175933_dateexpirationnullable")]
-    partial class dateexpirationnullable
+    [Migration("20240726011945_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,10 @@ namespace giftcard_api.Migrations
                     b.Property<int>("IdBeneficiaryWallet")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdUser")
+                    b.Property<int>("IdSubscriber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdUser")
                         .HasColumnType("int");
 
                     b.Property<string>("Nom")
@@ -334,6 +337,9 @@ namespace giftcard_api.Migrations
                     b.Property<int>("IdPackage")
                         .HasColumnType("int");
 
+                    b.Property<double>("BudgetRestant")
+                        .HasColumnType("double");
+
                     b.Property<DateTime?>("DateExpiration")
                         .HasColumnType("datetime(6)");
 
@@ -341,6 +347,9 @@ namespace giftcard_api.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<double?>("MontantParCarte")
+                        .HasColumnType("double");
 
                     b.Property<int?>("NbrCarteGenere")
                         .HasColumnType("int");
@@ -372,7 +381,7 @@ namespace giftcard_api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("IdRole")
+                    b.Property<int?>("IdRole")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
@@ -409,9 +418,7 @@ namespace giftcard_api.Migrations
 
                     b.HasOne("giftcard_api.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("IdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IdUser");
 
                     b.Navigation("BeneficiaryWallet");
 
@@ -512,9 +519,7 @@ namespace giftcard_api.Migrations
                 {
                     b.HasOne("giftcard_api.Models.Role", "Role")
                         .WithMany()
-                        .HasForeignKey("IdRole")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IdRole");
 
                     b.Navigation("Role");
                 });

@@ -12,6 +12,7 @@ namespace giftcard_api.Models
         private int _idPackage;
         private int _idSubscriber;
         private string _dateSouscription;
+        private double _budgetRestant;
         private double? _montantParCarte=null;
         private int? _nbrCarteGenere=0;
         private DateTime? _dateExpiration;
@@ -26,6 +27,11 @@ namespace giftcard_api.Models
         {
             get => _nbrCarteGenere;
             set => _nbrCarteGenere = value;
+        }
+        public double BudgetRestant
+        {
+            get => _budgetRestant;
+            set => _budgetRestant = value;
         }
 
         public int IdSubscriber
