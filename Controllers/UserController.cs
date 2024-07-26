@@ -258,8 +258,8 @@ namespace giftcard_api.Controllers
 
             return BadRequest(ModelState);
         }
-        [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}/withpackage/{idpackage}")]
-        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, int idpackage, BeneficiaryDto beneficiarydto)
+        [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}")]
+        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber ,BeneficiaryDto beneficiarydto)
         {
             if (ModelState.IsValid)
             {
@@ -269,7 +269,7 @@ namespace giftcard_api.Controllers
                         .Include(s => s.Package)
                         .Include(s => s.Subscriber)
                             .ThenInclude(sub => sub.SubscriberWallet)
-                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == idpackage);
+                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == beneficiarydto.IdPackage && u.Id==beneficiarydto.IdSubscription);
                     if (subscription == null)
                     {
                         return NotFound("Subscription Not Found");
@@ -284,11 +284,11 @@ namespace giftcard_api.Controllers
                     {
                         return BadRequest("Le budget restant n'est pas suffisant pour générer une carte de cadeau");
                     }
-                    if (DateTime.UtcNow >= subscription.DateExpiration)
+                    if ((DateTime.UtcNow >= subscription.DateExpiration)&& (subscription.DateExpiration!=null))
                     {
                         return BadRequest("La souscription est  expirée");
                     }
-                    if (subscription.NbrCarteGenere + 1 > (package.MaxCarte ?? 0))
+                    if ((package.MaxCarte!=null) && (subscription.NbrCarteGenere + 1 > (package.MaxCarte )))
                     {
                         return BadRequest("Le nombre de carte a atteint la limite ");
                     }

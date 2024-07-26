@@ -5,6 +5,10 @@ namespace giftcard_api.Data
 {
     public class BeneficiaryDto
     {
+        [Required]
+        public int IdSubscription { get; set; }
+        [Required]
+        public int IdPackage { get; set; }
 
         [EmailAddress]
         [Required]
