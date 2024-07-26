@@ -10,7 +10,7 @@ namespace giftcard_api.Models
         private double _montant;
         private string _date;
 
-        // Propriétés publiques
+
         [Key]
         public int Id
         {
@@ -42,9 +42,10 @@ namespace giftcard_api.Models
         private int _idMerchant;
         public int IdMerchant { get => _idMerchant; set => _idMerchant = value; }
 
+        [JsonIgnore]
         [ForeignKey("IdMerchant")]
         public Merchant Merchant { get; set; }
-
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public MerchantActions Action { get; set; }
         public MerchantHistory() : base() { }
         public MerchantHistory(MerchantActions action) : base()
@@ -64,9 +65,10 @@ namespace giftcard_api.Models
         private int _idSubscriber;
         public int IdSubscriber { get => _idSubscriber; set => _idSubscriber = value; }
 
+        [JsonIgnore]
         [ForeignKey("IdSubscriber")]
         public Subscriber Subscriber { get; set; }
-
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public SubscriberActions Action { get; set; }
         public SubscriberHistory() : base() { }
         public SubscriberHistory(SubscriberActions action) : base()
@@ -84,10 +86,11 @@ namespace giftcard_api.Models
         }
         private int _idBeneficiary;
         public int IdBeneficiary { get => _idBeneficiary; set => _idBeneficiary = value; }
-
+        [JsonIgnore]
         [ForeignKey("IdBeneficiary")]
         public Beneficiary Beneficiary { get; set; }
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public BeneficiaryActions Action { get; set; }
         public BeneficiaryHistory() : base() { }
         public BeneficiaryHistory(BeneficiaryActions action) : base()

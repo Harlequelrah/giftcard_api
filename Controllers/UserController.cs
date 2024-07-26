@@ -288,7 +288,7 @@ namespace giftcard_api.Controllers
                     {
                         return BadRequest("La souscription est  expirée");
                     }
-                    if ( subscription.NbrCarteGenere + 1 > (package.MaxCarte ?? 0))
+                    if (subscription.NbrCarteGenere + 1 > (package.MaxCarte ?? 0))
                     {
                         return BadRequest("Le nombre de carte a atteint la limite ");
                     }
@@ -383,9 +383,16 @@ namespace giftcard_api.Controllers
                     }
                     else
                     {
+                        var beneficiaryWallet = new BeneficiaryWallet
+                        {
+                            Solde = (double)cartecadeau
+                        };
+                        _context.BeneficiaryWallets.Add(beneficiaryWallet);
+                        await _context.SaveChangesAsync();
                         var beneficiary = new Beneficiary
                         {
                             IdUser = null,
+                            IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
@@ -489,7 +496,7 @@ namespace giftcard_api.Controllers
             return Ok(usersByRole);
         }
         // [Authorize]
-        [HttpGet("byactiviy/{isActive}")]
+        [HttpGet("byIsActive/{isActive}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByActivity(bool isActive)
         {
             var usersByActivity = await _context.Users

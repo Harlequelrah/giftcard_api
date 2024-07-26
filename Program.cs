@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using giftcard_api.Models;
 using giftcard_api.Data;
-using Newtonsoft.Json;
+
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using giftcard_api.Services;
@@ -18,11 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers()
-        .AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            // Autres configurations si nécessaires
-        });
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 
 

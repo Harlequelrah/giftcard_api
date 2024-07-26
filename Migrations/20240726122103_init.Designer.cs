@@ -12,7 +12,7 @@ using giftcard_api.Data;
 namespace giftcard_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240726011945_init")]
+    [Migration("20240726122103_init")]
     partial class init
     {
         /// <inheritdoc />
