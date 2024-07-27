@@ -9,7 +9,7 @@ namespace giftcard_api.Models
         private int _id;
         private int _idUser;
         private int _idSubscriberWallet;
-        private int _idSubscriberHistory;
+        
         private string _subscriberName;
 
         [Key]
