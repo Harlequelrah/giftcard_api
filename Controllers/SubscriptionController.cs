@@ -36,6 +36,17 @@ namespace giftcard_api.Controllers
                                  .Where(s => s.IdSubscriber == subscriberId)
                                  .ToListAsync();
         }
+        [HttpGet("{Idsubscription}")]
+        public async Task<ActionResult<Subscription>> GetSubscription(int Idsubscription)
+        {
+            var subscription = await _context.Subscriptions.FindAsync(Idsubscription);
+            if (subscription == null)
+            {
+                return NotFound();
+            }
+            return subscription;
+        }
+
 
 
         [HttpGet("Package/{packageId}")]
@@ -47,19 +58,6 @@ namespace giftcard_api.Controllers
         }
 
         // Get: api/Subscription/{subscriberId}/{packageId}
-        [HttpGet("{subscriberId}/{packageId}")]
-        public async Task<ActionResult<Subscription>> GetSubscription(int subscriberId, int packageId)
-        {
-            var subscription = await _context.Subscriptions
-                                             .FirstOrDefaultAsync(s => s.IdSubscriber == subscriberId && s.IdPackage == packageId);
-
-            if (subscription == null)
-            {
-                return NotFound();
-            }
-
-            return subscription;
-        }
 
 
         [HttpPost]
@@ -114,12 +112,24 @@ namespace giftcard_api.Controllers
 
             return CreatedAtAction("GetSubscription", new { subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
         }
-
-
-        [HttpPut("{subscriberId}/{packageId}")]
-        public async Task<IActionResult> PutSubscription(int subscriberId, int packageId, Subscription subscription)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Subscription(int id)
         {
-            if (subscriberId != subscription.IdSubscriber || packageId != subscription.IdPackage)
+            var subscription = await _context.Subscriptions.FindAsync(id);
+            if (subscription == null)
+            {
+                return NotFound();
+            }
+
+            _context.Subscriptions.Remove(subscription);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSubscription(int id, Subscription subscription)
+        {
+            if (id != subscription.Id)
             {
                 return BadRequest();
             }
@@ -132,7 +142,8 @@ namespace giftcard_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubscriptionExists(subscriberId, packageId))
+                bool subscriptionExists =   _context.Subscriptions.Any(e => e.Id == id);
+                if (!subscriptionExists)
                 {
                     return NotFound();
                 }
@@ -146,25 +157,7 @@ namespace giftcard_api.Controllers
         }
 
 
-        [HttpDelete("{subscriberId}/{packageId}")]
-        public async Task<IActionResult> DeleteSubscription(int subscriberId, int packageId)
-        {
-            var subscription = await _context.Subscriptions
-                                             .FirstOrDefaultAsync(s => s.IdSubscriber == subscriberId && s.IdPackage == packageId);
-            if (subscription == null)
-            {
-                return NotFound();
-            }
 
-            _context.Subscriptions.Remove(subscription);
-            await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
-
-        private bool SubscriptionExists(int subscriberId, int packageId)
-        {
-            return _context.Subscriptions.Any(e => e.IdSubscriber == subscriberId && e.IdPackage == packageId);
-        }
     }
 }
