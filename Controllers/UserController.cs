@@ -180,7 +180,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
 
                     var token = await _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token, user, subscriber, subscriberWallet, subscriberHistory });
+                    return Ok(new { Token = token,subscriber, subscriberWallet, subscriberHistory });
                 }
                 catch (Exception ex)
                 {
@@ -258,6 +258,7 @@ namespace giftcard_api.Controllers
 
             return BadRequest(ModelState);
         }
+        [Authorize(Roles="SUBSCRIBER")]
         [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}")]
         public async Task<IActionResult> RegisterBeneficiary(int idsubscriber ,BeneficiaryDto beneficiarydto)
         {
@@ -413,7 +414,7 @@ namespace giftcard_api.Controllers
 
 
 
-        // POST: api/auth/login
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel user)
         {
@@ -451,6 +452,7 @@ namespace giftcard_api.Controllers
             return Ok(user.RefreshToken);
         }
 
+
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
         {
@@ -473,13 +475,13 @@ namespace giftcard_api.Controllers
             public string RefreshToken { get; set; }
         }
 
-        // [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-        // [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpGet("byrole/{idRole}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int? idRole)
         {
@@ -495,7 +497,7 @@ namespace giftcard_api.Controllers
 
             return Ok(usersByRole);
         }
-        // [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpGet("byIsActive/{isActive}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByActivity(bool isActive)
         {
@@ -511,7 +513,7 @@ namespace giftcard_api.Controllers
             return Ok(usersByActivity);
         }
 
-        [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
@@ -523,7 +525,7 @@ namespace giftcard_api.Controllers
             return user;
         }
 
-        [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateDto user)
         {
@@ -562,7 +564,7 @@ namespace giftcard_api.Controllers
             return NoContent();
 
         }
-        [Authorize]
+        [Authorize(Roles="ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

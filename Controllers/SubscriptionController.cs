@@ -21,14 +21,14 @@ namespace giftcard_api.Controllers
             _context = context;
         }
 
-
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptions()
         {
             return await _context.Subscriptions.ToListAsync();
         }
 
-
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("Subscriber/{subscriberId}")]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptionsBySubscriber(int subscriberId)
         {
@@ -36,6 +36,8 @@ namespace giftcard_api.Controllers
                                  .Where(s => s.IdSubscriber == subscriberId)
                                  .ToListAsync();
         }
+
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("{Idsubscription}")]
         public async Task<ActionResult<Subscription>> GetSubscription(int Idsubscription)
         {
@@ -48,7 +50,7 @@ namespace giftcard_api.Controllers
         }
 
 
-
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("Package/{packageId}")]
         public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptionsByPackage(int packageId)
         {
@@ -59,7 +61,7 @@ namespace giftcard_api.Controllers
 
         // Get: api/Subscription/{subscriberId}/{packageId}
 
-
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpPost]
         public async Task<ActionResult<Subscription>> PostSubscription(SubscriptionDto subscriptiondto)
         {
@@ -112,6 +114,7 @@ namespace giftcard_api.Controllers
 
             return CreatedAtAction("GetSubscription", new { subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
         }
+        [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Subscription(int id)
         {
@@ -126,6 +129,7 @@ namespace giftcard_api.Controllers
 
             return NoContent();
         }
+        [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSubscription(int id, Subscription subscription)
         {
@@ -142,7 +146,7 @@ namespace giftcard_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                bool subscriptionExists =   _context.Subscriptions.Any(e => e.Id == id);
+                bool subscriptionExists = _context.Subscriptions.Any(e => e.Id == id);
                 if (!subscriptionExists)
                 {
                     return NotFound();
