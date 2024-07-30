@@ -29,8 +29,6 @@ namespace giftcard_api.Controllers
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
-        [HttpGet("history/{idSubscriber}")]
-        public async Task<ActionResult<IEnumerable<SubscriberHistory>>> GetSubscriberHistories(int idSubscriber)
         [HttpGet("{id}")]
         public async Task<ActionResult<Subscriber>> GetSubscriber(int id)
         {
@@ -45,8 +43,6 @@ namespace giftcard_api.Controllers
         }
 
         [Authorize(Roles = "ADMIN")]
-        [HttpGet("history/{idSubscriber}")]
-        public async Task<ActionResult<IEnumerable<SubscriberHistory>>> GetSubscriberHistories(int idSubscriber)
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSubscriber(int id, Subscriber subscriber)
         {
@@ -77,8 +73,6 @@ namespace giftcard_api.Controllers
         }
 
         [Authorize(Roles = "ADMIN")]
-        [HttpGet("history/{idSubscriber}")]
-        public async Task<ActionResult<IEnumerable<SubscriberHistory>>> GetSubscriberHistories(int idSubscriber)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubscriber(int id)
         {
@@ -95,8 +89,6 @@ namespace giftcard_api.Controllers
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
-        [HttpGet("history/{idSubscriber}")]
-        public async Task<ActionResult<IEnumerable<SubscriberHistory>>> GetSubscriberHistories(int idSubscriber)
         [HttpGet("wallet/{idSubscriber}")]
         public async Task<ActionResult<SubscriberWallet>> GetSubscriberWallet(int idSubscriber)
         {

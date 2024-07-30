@@ -4,6 +4,7 @@ using giftcard_api.Models;
 using giftcard_api.Data;
 using giftcard_api.Services;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
 

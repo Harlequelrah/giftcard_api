@@ -180,7 +180,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
 
                     var token = await _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token,subscriber, subscriberWallet, subscriberHistory });
+                    return Ok(new { Token = token, subscriber, subscriberWallet, subscriberHistory });
                 }
                 catch (Exception ex)
                 {
@@ -258,9 +258,9 @@ namespace giftcard_api.Controllers
 
             return BadRequest(ModelState);
         }
-        [Authorize(Roles="SUBSCRIBER")]
+        [Authorize(Roles = "SUBSCRIBER")]
         [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}")]
-        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber ,BeneficiaryDto beneficiarydto)
+        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, BeneficiaryDto beneficiarydto)
         {
             if (ModelState.IsValid)
             {
@@ -270,7 +270,7 @@ namespace giftcard_api.Controllers
                         .Include(s => s.Package)
                         .Include(s => s.Subscriber)
                             .ThenInclude(sub => sub.SubscriberWallet)
-                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == beneficiarydto.IdPackage && u.Id==beneficiarydto.IdSubscription);
+                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == beneficiarydto.IdPackage && u.Id == beneficiarydto.IdSubscription);
                     if (subscription == null)
                     {
                         return NotFound("Subscription Not Found");
@@ -285,11 +285,11 @@ namespace giftcard_api.Controllers
                     {
                         return BadRequest("Le budget restant n'est pas suffisant pour générer une carte de cadeau");
                     }
-                    if ((DateTime.UtcNow >= subscription.DateExpiration)&& (subscription.DateExpiration!=null))
+                    if ((DateTime.UtcNow >= subscription.DateExpiration) && (subscription.DateExpiration != null))
                     {
                         return BadRequest("La souscription est  expirée");
                     }
-                    if ((package.MaxCarte!=null) && (subscription.NbrCarteGenere + 1 > (package.MaxCarte )))
+                    if ((package.MaxCarte != null) && (subscription.NbrCarteGenere + 1 > (package.MaxCarte)))
                     {
                         return BadRequest("Le nombre de carte a atteint la limite ");
                     }
@@ -379,7 +379,7 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateToken(existingUser);
 
-                        return Ok(new { Token = token,  beneficiary });
+                        return Ok(new { Token = token, beneficiary });
 
                     }
                     else
@@ -475,13 +475,13 @@ namespace giftcard_api.Controllers
             public string RefreshToken { get; set; }
         }
 
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("byrole/{idRole}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int? idRole)
         {
@@ -497,7 +497,7 @@ namespace giftcard_api.Controllers
 
             return Ok(usersByRole);
         }
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("byIsActive/{isActive}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByActivity(bool isActive)
         {
@@ -513,7 +513,7 @@ namespace giftcard_api.Controllers
             return Ok(usersByActivity);
         }
 
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
@@ -525,7 +525,7 @@ namespace giftcard_api.Controllers
             return user;
         }
 
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateDto user)
         {
@@ -564,7 +564,7 @@ namespace giftcard_api.Controllers
             return NoContent();
 
         }
-        [Authorize(Roles="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
