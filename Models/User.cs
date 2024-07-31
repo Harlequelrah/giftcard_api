@@ -32,11 +32,9 @@ namespace giftcard_api.Models
             get => _idRole;
             set => _idRole = value;
         }
+        [JsonIgnore]
         [ForeignKey("IdRole")]
         public Role? Role { get; set; }
-
-
-
 
         public string Email
         {

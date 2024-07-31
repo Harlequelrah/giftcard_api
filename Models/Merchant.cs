@@ -35,9 +35,12 @@ namespace giftcard_api.Models
             set => _idMerchantWallet = value;
         }
 
+        [JsonIgnore]
         [ForeignKey("IdUser")]
         public User User { get; set; }
 
+
+        [JsonIgnore]
         [ForeignKey("IdMerchantWallet")]
         public MerchantWallet MerchantWallet { get; set; }
 

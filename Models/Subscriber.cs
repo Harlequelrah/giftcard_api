@@ -9,7 +9,7 @@ namespace giftcard_api.Models
         private int _id;
         private int _idUser;
         private int _idSubscriberWallet;
-        
+
         private string _subscriberName;
 
         [Key]
@@ -36,10 +36,10 @@ namespace giftcard_api.Models
             get => _subscriberName;
             set => _subscriberName = value;
         }
-
+        [JsonIgnore]
         [ForeignKey("IdUser")]
         public User User { get; set; }
-
+        [JsonIgnore]
         [ForeignKey("IdSubscriberWallet")]
         public SubscriberWallet SubscriberWallet { get; set; }
 

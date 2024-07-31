@@ -47,9 +47,11 @@ namespace giftcard_api.Models
             set => _idSubscriber = value;
         }
 
+        [JsonIgnore]
         [ForeignKey("IdPackage")]
         public Package Package { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("IdSubscriber")]
         public Subscriber Subscriber { get; set; }
 
