@@ -89,6 +89,24 @@ namespace giftcard_api.Controllers
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
+        [HttpGet("beneficiaries/{idSubscriber}")]
+        public async Task<ActionResult<IEnumerable<Beneficiary>>> GetBeneficiaries(int idSubscriber)
+        {
+            var beneficiaries = await _context.Beneficiaries
+                 .Where(sh => sh.IdSubscriber == idSubscriber)
+                 .ToListAsync();
+
+            if (beneficiaries == null || !beneficiaries.Any())
+            {
+                return NotFound();
+            }
+
+            return beneficiaries;
+
+        }
+
+
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("wallet/{idSubscriber}")]
         public async Task<ActionResult<SubscriberWallet>> GetSubscriberWallet(int idSubscriber)
         {
