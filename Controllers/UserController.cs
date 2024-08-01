@@ -270,7 +270,7 @@ namespace giftcard_api.Controllers
                         .Include(s => s.Package)
                         .Include(s => s.Subscriber)
                             .ThenInclude(sub => sub.SubscriberWallet)
-                        .FirstOrDefaultAsync(u => u.IdSubscriber == idsubscriber && u.IdPackage == beneficiarydto.IdPackage && u.Id == beneficiarydto.IdSubscription);
+                        .FirstOrDefaultAsync(u=>u.Id == beneficiarydto.IdSubscription);
                     if (subscription == null)
                     {
                         return NotFound("Subscription Not Found");

@@ -7,8 +7,6 @@ namespace giftcard_api.Data
     {
         [Required]
         public int IdSubscription { get; set; }
-        [Required]
-        public int IdPackage { get; set; }
 
         [EmailAddress]
         [Required]

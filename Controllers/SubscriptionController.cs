@@ -110,10 +110,7 @@ namespace giftcard_api.Controllers
             _context.Entry(wallet).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-
-
-
-            return CreatedAtAction("GetSubscription", new { subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
+            return CreatedAtAction(nameof(GetSubscription), new { Idsubscription = subscription.Id ,subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
         }
         [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
