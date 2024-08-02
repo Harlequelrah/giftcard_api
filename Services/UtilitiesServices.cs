@@ -36,6 +36,11 @@ namespace giftcard_api.Services
         {
             return DateTime.UtcNow.ToString(format);
         }
+        public static string FormatDate(DateTime date ,string format = "yyyy-MM-dd HH:mm:ss")
+        {
+            return date.ToString(format);
+        }
+
 
     }
 

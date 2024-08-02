@@ -481,7 +481,7 @@ namespace giftcard_api.Controllers
         {
             return await _context.Users.ToListAsync();
         }
-        // [Authorize(Roles = "SUBSCRIBER,ADMIN")]
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("GetIdSubscriber/{id}")]
         public async Task<ActionResult<int>> GetIdSusbcriber(int id)
         {
