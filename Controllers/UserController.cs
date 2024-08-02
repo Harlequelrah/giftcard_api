@@ -482,7 +482,7 @@ namespace giftcard_api.Controllers
             return await _context.Users.ToListAsync();
         }
         // [Authorize(Roles = "SUBSCRIBER,ADMIN")]
-        [HttpGet("/GetIdSubscriber/{id}")]
+        [HttpGet("GetIdSubscriber/{id}")]
         public async Task<ActionResult<int>> GetIdSusbcriber(int id)
         {
             var subscriber = await _context.Subscribers.FirstOrDefaultAsync(u => u.IdUser == id);;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
-    // [Authorize(Roles = "ADMIN,SUBSCRIBER")]
+    [Authorize(Roles = "ADMIN,SUBSCRIBER")]
     [Route("api/[controller]")]
     [ApiController]
     public class PackageController : ControllerBase
