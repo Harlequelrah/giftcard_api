@@ -481,6 +481,19 @@ namespace giftcard_api.Controllers
         {
             return await _context.Users.ToListAsync();
         }
+        // [Authorize(Roles = "SUBSCRIBER,ADMIN")]
+        [HttpGet("/GetIdSubscriber/{id}")]
+        public async Task<ActionResult<int>> GetIdSusbcriber(int id)
+        {
+            var subscriber = await _context.Subscribers.FirstOrDefaultAsync(u => u.IdUser == id);;
+            if (subscriber != null)
+            {
+                return subscriber.Id ;
+            }
+            else{
+                return NotFound();
+            }
+        }
         [Authorize(Roles = "ADMIN")]
         [HttpGet("byrole/{idRole}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int? idRole)
@@ -518,7 +531,7 @@ namespace giftcard_api.Controllers
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (GetUser == null)
+            if (user == null)
             {
                 return NotFound();
             }

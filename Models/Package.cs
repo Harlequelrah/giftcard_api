@@ -78,7 +78,7 @@ namespace giftcard_api.Models
         }
 
 
-
+        [JsonIgnore]
         public ICollection<Subscription> PackageSubscriptions { get; set; } = new HashSet<Subscription>();
     }
 }
