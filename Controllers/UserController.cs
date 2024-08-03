@@ -350,6 +350,7 @@ namespace giftcard_api.Controllers
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
+                            TelephoneNumero=existingUser.Telephone
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();
@@ -397,6 +398,7 @@ namespace giftcard_api.Controllers
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
+                            TelephoneNumero = beneficiarydto.TelephoneNumero
                         };
                         return Ok(new { beneficiary, Montant = cartecadeau });
                     }

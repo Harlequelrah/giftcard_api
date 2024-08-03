@@ -20,5 +20,7 @@ namespace giftcard_api.Data
         [Required]
         public bool Has_gochap { get; set; }
 
+        public string? TelephoneNumero { get; set; }
+
     }
 }

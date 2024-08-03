@@ -16,6 +16,7 @@ namespace giftcard_api.Models
         private string _prenom;
 
         private bool _has_gochap;
+        private string? _telephoneNumero;
         private byte[]? _profilePhoto;
 
         // Propriétés publiques
@@ -67,16 +68,22 @@ namespace giftcard_api.Models
             get => _prenom;
             set => _prenom = value;
         }
+        public string TelephoneNumero
+        {
+            get => _telephoneNumero;
+            set => _telephoneNumero = value;
+        }
 
         public byte[]? ProfilePhoto
         {
             get => _profilePhoto;
             set => _profilePhoto = value;
         }
-        public Beneficiary(){
+        public Beneficiary()
+        {
 
         }
-        public Beneficiary(int idUser,  string nom, string prenom,bool has_gochap)
+        public Beneficiary(int idUser, string nom, string prenom, bool has_gochap)
         {
             _idUser = idUser;
             _nom = nom;
