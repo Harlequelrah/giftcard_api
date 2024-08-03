@@ -42,6 +42,20 @@ namespace giftcard_api.Controllers
             return subscriber;
         }
 
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
+        [HttpGet("ByUser/{iduser}")]
+        public async Task<ActionResult<Subscriber>> GetSubscriberByUser(int iduser)
+        {
+                var subscriber = await _context.Subscribers
+                .Include(s => s.SubscriberWallet)
+                .FirstOrDefaultAsync(sw => sw.IdUser == iduser);
+            if (subscriber == null)
+            {
+                return NotFound("Subscriber Not Found");
+            }
+            return subscriber;
+        }
+
         [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSubscriber(int id, Subscriber subscriber)

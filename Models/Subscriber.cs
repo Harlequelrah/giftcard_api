@@ -39,11 +39,12 @@ namespace giftcard_api.Models
         [JsonIgnore]
         [ForeignKey("IdUser")]
         public User User { get; set; }
-        [JsonIgnore]
+        
         [ForeignKey("IdSubscriberWallet")]
         public SubscriberWallet SubscriberWallet { get; set; }
-
+        [JsonIgnore]
         public ICollection<Subscription> SubscriberSubscriptions { get; set; }  = new HashSet<Subscription>();
+        [JsonIgnore]
         public ICollection<SubscriberHistory> Histories { get; set; } = new HashSet<SubscriberHistory>();
 
     }
