@@ -400,6 +400,8 @@ namespace giftcard_api.Controllers
                             Has_gochap = beneficiarydto.Has_gochap,
                             TelephoneNumero = beneficiarydto.TelephoneNumero
                         };
+                        _context.Beneficiaries.Add(beneficiary);
+                        await _context.SaveChangesAsync();
                         return Ok(new { beneficiary, Montant = cartecadeau });
                     }
 
