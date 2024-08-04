@@ -393,6 +393,7 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var beneficiary = new Beneficiary
                         {
+                            IdSubscriber = idsubscriber,
                             IdUser = null,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
