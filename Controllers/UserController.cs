@@ -259,8 +259,8 @@ namespace giftcard_api.Controllers
             return BadRequest(ModelState);
         }
         [Authorize(Roles = "SUBSCRIBER")]
-        [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}")]
-        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, BeneficiaryDto beneficiarydto)
+        [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}/value/{amount}")]
+        public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, double? amount, BeneficiaryDto beneficiarydto)
         {
             if (ModelState.IsValid)
             {
@@ -280,7 +280,16 @@ namespace giftcard_api.Controllers
                     {
                         return NotFound("Package Not Found");
                     }
-                    var cartecadeau = subscription.MontantParCarte == null ? package.MontantBase : subscription.MontantParCarte;
+                    double? cartecadeau ;
+
+                    if(amount==-1.0)
+                    {
+                        cartecadeau = subscription.MontantParCarte == null ? package.MontantBase : subscription.MontantParCarte;
+                    }
+                    else{
+                        cartecadeau=amount;
+                    }
+
                     if (subscription.BudgetRestant - cartecadeau < 0)
                     {
                         return BadRequest("Le budget restant n'est pas suffisant pour générer une carte de cadeau");

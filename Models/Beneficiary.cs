@@ -91,6 +91,7 @@ namespace giftcard_api.Models
             _has_gochap = has_gochap;
         }
 
+        [JsonIgnore]
         public ICollection<BeneficiaryHistory> Histories { get; set; } = new HashSet<BeneficiaryHistory>();
     }
 }
