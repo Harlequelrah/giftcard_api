@@ -18,7 +18,6 @@ namespace giftcard_api.Models
         public double Budget { get; set; }
         [Required]
         public double Prix { get; set; }
-        public int? MaxCarte { get; set; } = null ;
         [Required]
         public double MontantBase { get; set; }
 

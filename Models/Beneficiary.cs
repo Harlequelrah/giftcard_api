@@ -16,7 +16,7 @@ namespace giftcard_api.Models
         private string _prenom;
 
         private bool _has_gochap;
-        private string? _telephoneNumero;
+        private string _telephoneNumero;
         private byte[]? _profilePhoto;
 
         // Propriétés publiques

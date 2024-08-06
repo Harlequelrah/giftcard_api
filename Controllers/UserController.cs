@@ -298,10 +298,6 @@ namespace giftcard_api.Controllers
                     {
                         return BadRequest("La souscription est  expirée");
                     }
-                    if ((package.MaxCarte != null) && (subscription.NbrCarteGenere + 1 > (package.MaxCarte)))
-                    {
-                        return BadRequest("Le nombre de carte a atteint la limite ");
-                    }
 
                     subscription.NbrCarteGenere++;
                     subscription.BudgetRestant -= (double)cartecadeau;
@@ -359,7 +355,7 @@ namespace giftcard_api.Controllers
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
-                            TelephoneNumero=existingUser.Telephone
+                            TelephoneNumero=beneficiarydto.TelephoneNumero
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();

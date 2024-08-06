@@ -49,7 +49,6 @@ namespace giftcard_api.Controllers
                 Budget= packagedto.Budget,
                 Prix= packagedto.Prix,
                 MontantBase= packagedto.MontantBase,
-                MaxCarte= packagedto.MaxCarte,
                 NbrJour= packagedto.NbrJour,
                 Description= packagedto.Description,
             };

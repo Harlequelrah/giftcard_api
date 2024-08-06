@@ -15,7 +15,6 @@ namespace giftcard_api.Models
         private int? _nbrJour=null;
         private double _budget;
         private double _prix;
-        private int? _maxCarte=null;
         private double _montantBase;
         private string _description;
 
@@ -60,11 +59,6 @@ namespace giftcard_api.Models
             set => _prix = value;
         }
 
-        public int? MaxCarte
-        {
-            get => _maxCarte;
-            set => _maxCarte = value;
-        }
 
         public double MontantBase
         {
