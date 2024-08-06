@@ -14,10 +14,9 @@ namespace giftcard_api.Models
         private int _idBeneficiaryWallet;
         private string _nom;
         private string _prenom;
-
         private bool _has_gochap;
         private string _telephoneNumero;
-        private byte[]? _profilePhoto;
+        private string? _profilPhoto;
 
         // Propriétés publiques
         [Key]
@@ -74,10 +73,10 @@ namespace giftcard_api.Models
             set => _telephoneNumero = value;
         }
 
-        public byte[]? ProfilePhoto
+        public string? ProfilPhoto
         {
-            get => _profilePhoto;
-            set => _profilePhoto = value;
+            get => _profilPhoto;
+            set => _profilPhoto = value;
         }
         public Beneficiary()
         {

@@ -18,5 +18,6 @@ namespace giftcard_api.Data
         public string Prenom { get; set; }
         [Required]
         public string Telephone { get; set; }
+        public string? ProfilPhoto { get; set; }
     }
 }

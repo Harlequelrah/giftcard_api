@@ -13,7 +13,7 @@ namespace giftcard_api.Models
         private int _idMerchantWallet;
         private string _nom;
         private string _prenom;
-        private byte[]? _profilePhoto;
+        private string? _profilPhoto;
 
         // Propriétés publiques
         [Key]
@@ -56,10 +56,10 @@ namespace giftcard_api.Models
             set => _prenom = value;
         }
 
-        public byte[]? ProfilePhoto
+        public string? ProfilPhoto
         {
-            get => _profilePhoto;
-            set => _profilePhoto = value;
+            get => _profilPhoto;
+            set => _profilPhoto = value;
         }
 
         public ICollection<MerchantHistory> Histories { get; set; } = new HashSet<MerchantHistory>();
