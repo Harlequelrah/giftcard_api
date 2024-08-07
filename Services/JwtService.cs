@@ -34,7 +34,7 @@ namespace giftcard_api.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, RoleName),
-                // Ajoutez d'autres claims selon vos besoins
+                new Claim("IsActive", user.IsActive.ToString())
             }),
                 Expires = DateTime.UtcNow.AddDays(3),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
