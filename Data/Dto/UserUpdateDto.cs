@@ -9,18 +9,17 @@ namespace giftcard_api.Models
     {
         [Required]
         public int Id { get; set; }
-        [Required]
-        public string Email { get; set; }
-        [Required]
-        public string Telephone { get; set; }
-        [Required]
 
-        public string Password { get; set; }
-        [Required]
-        public string Adresse { get; set; }
-        [Required]
-        public bool IsActive { get; set; }
-       
+        public string? Email { get; set; }
+
+        public string? Telephone { get; set; }
+
+        public string? Password { get; set; }
+
+        public string? Adresse { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
 
     }
 }

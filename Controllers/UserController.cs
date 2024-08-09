@@ -99,7 +99,6 @@ namespace giftcard_api.Controllers
                     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userdto.Password);
                     var user = new User
                     {
-                        IdRole = null,
                         Email = userdto.Email,
                         Password = hashedPassword,
                         Adresse = userdto.Adresse,
@@ -270,7 +269,7 @@ namespace giftcard_api.Controllers
                         .Include(s => s.Package)
                         .Include(s => s.Subscriber)
                             .ThenInclude(sub => sub.SubscriberWallet)
-                        .FirstOrDefaultAsync(u=>u.Id == beneficiarydto.IdSubscription);
+                        .FirstOrDefaultAsync(u => u.Id == beneficiarydto.IdSubscription);
                     if (subscription == null)
                     {
                         return NotFound("Subscription Not Found");
@@ -280,14 +279,15 @@ namespace giftcard_api.Controllers
                     {
                         return NotFound("Package Not Found");
                     }
-                    double? cartecadeau ;
+                    double? cartecadeau;
 
-                    if(amount==-1.0)
+                    if (amount == -1.0)
                     {
                         cartecadeau = subscription.MontantParCarte == null ? package.MontantBase : subscription.MontantParCarte;
                     }
-                    else{
-                        cartecadeau=amount;
+                    else
+                    {
+                        cartecadeau = amount;
                     }
 
                     if (subscription.BudgetRestant - cartecadeau < 0)
@@ -355,7 +355,7 @@ namespace giftcard_api.Controllers
                             Nom = beneficiarydto.Nom,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
-                            TelephoneNumero=beneficiarydto.TelephoneNumero
+                            TelephoneNumero = beneficiarydto.TelephoneNumero
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();
@@ -491,16 +491,25 @@ namespace giftcard_api.Controllers
         {
             return await _context.Users.ToListAsync();
         }
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("WithRole")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersWithRoles()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .ToListAsync();
+        }
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("GetIdSubscriber/{id}")]
         public async Task<ActionResult<int>> GetIdSusbcriber(int id)
         {
-            var subscriber = await _context.Subscribers.FirstOrDefaultAsync(u => u.IdUser == id);;
+            var subscriber = await _context.Subscribers.FirstOrDefaultAsync(u => u.IdUser == id); ;
             if (subscriber != null)
             {
-                return subscriber.Id ;
+                return subscriber.Id;
             }
-            else{
+            else
+            {
                 return NotFound();
             }
         }
@@ -554,20 +563,21 @@ namespace giftcard_api.Controllers
         {
             if (id != user.Id)
             {
-                return BadRequest();
+                return BadRequest("Les identifiants ne correspondent pas");
             }
             var existinguser = await _context.Users.FindAsync(id);
+            var hashedPassword = user.Password != null ? BCrypt.Net.BCrypt.HashPassword(user.Password) : existinguser.Password;
+            existinguser.Email = user.Email?? existinguser.Email;
+            existinguser.Password = hashedPassword;
+            existinguser.Adresse = user.Adresse ?? existinguser.Adresse;
+            existinguser.Telephone = user.Telephone ?? existinguser.Telephone;
+            existinguser.IsActive = user.IsActive;
+            _context.Entry(existinguser).State = EntityState.Modified;
             if (existinguser == null)
             {
                 return NotFound();
             }
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-            existinguser.Email = user.Email;
-            existinguser.Password = hashedPassword;
-            existinguser.Adresse = user.Adresse;
-            existinguser.Telephone = user.Telephone;
-            existinguser.IsActive = user.IsActive;
             _context.Entry(existinguser).State = EntityState.Modified;
             try
             {
@@ -587,6 +597,7 @@ namespace giftcard_api.Controllers
             return NoContent();
 
         }
+
         [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)

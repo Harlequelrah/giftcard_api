@@ -9,7 +9,7 @@ namespace giftcard_api.Models
     {
         // Attributs privés
         private int _id;
-        private int? _idRole;
+        private int _idRole=5;
         private string _email;
         private string _password;
         private string _telephone;
@@ -19,7 +19,6 @@ namespace giftcard_api.Models
         private string _adresse;
         private bool _isActive = true;
 
-        // Propriétés publiques
         [Key]
         public int Id
         {
@@ -27,14 +26,14 @@ namespace giftcard_api.Models
             set => _id = value;
         }
 
-        public int? IdRole
+        public int IdRole
         {
             get => _idRole;
             set => _idRole = value;
         }
-        [JsonIgnore]
+        
         [ForeignKey("IdRole")]
-        public Role? Role { get; set; }
+        public Role Role { get; set; }
 
         public string Email
         {
@@ -46,23 +45,27 @@ namespace giftcard_api.Models
             get => _telephone;
             set => _telephone = value;
         }
+        [JsonIgnore]
         public string Password
         {
             get => _password;
             set => _password = value;
         }
 
+        [JsonIgnore]
         public string? RefreshToken
         {
             get => _refreshToken;
             set => _refreshToken = value;
         }
 
+        [JsonIgnore]
         public DateTime? RefreshTokenExpiryTime
         {
             get => _refreshTokenExpiryTime;
             set => _refreshTokenExpiryTime = value;
         }
+
         [StringLength(50)]
         public string? DateInscription
         {
