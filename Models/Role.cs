@@ -1,5 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System;
+
 
 namespace giftcard_api.Models
 {
@@ -9,8 +13,6 @@ namespace giftcard_api.Models
         private int _id;
         private string _roleNom;
 
-        // Propriétés publiques
-        [JsonIgnore]
         [Key]
         public int Id
         {
