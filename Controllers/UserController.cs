@@ -492,12 +492,26 @@ namespace giftcard_api.Controllers
             return await _context.Users.ToListAsync();
         }
         [Authorize(Roles = "ADMIN")]
-        [HttpGet("WithRole")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsersWithRoles()
+        [HttpGet("GetFormatedUsers")]
+        public async Task<ActionResult<IEnumerable<FullUser>>> GetFormatedUsers()
         {
-            return await _context.Users
-                .Include(u => u.Role)
-                .ToListAsync();
+            var users await _context.Users.Include(u=>u.Role).ToListAsync();
+            List<FullUser> fullusers = new List<FullUser>();
+            foreach (var user in users)
+            {
+                fullusers.Add(new FullUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Telephone = user.Telephone,
+                    Adresse = user.Adresse,
+                    DateInscription=user.DateInscription,
+                    IsActive=user.IsActive,
+                    NomRole = user.Role.RoleNom
+                });
+
+            }
+            return fullusers;
         }
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("GetIdSubscriber/{id}")]

@@ -20,4 +20,24 @@ namespace giftcard_api.Models
         public double? MontantParCarte { get; set; } = null;
 
     }
+    public class FullSubscriptionDto
+    {
+
+        public int Id { get; set; }
+
+        public string NomPackage { get; set; }
+
+        public string? NomSubscriber { get; set; }
+
+        public int? NbrCarteGenere { get; set; }
+
+        public double BudgetRestant {  get ; set; }
+
+        public string DateSouscription { get; set; }
+
+        public string? DateExpiration { get; set; }
+
+        public double? MontantParCarte { get; set; }
+
+    }
 }

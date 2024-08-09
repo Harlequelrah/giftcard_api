@@ -39,30 +39,36 @@ namespace giftcard_api.Controllers
         }
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("ForSubscriber/{subscriberId}")]
-        public async Task<ActionResult<IEnumerable<SubscriberSubscriptionDto>>> GetSubscriptionsForSubscriber(int subscriberId)
+        public async Task<ActionResult<IEnumerable<FullSubscriptionDto>>> GetSubscriptionsForSubscriber(int subscriberId)
         {
+            var subscriber = await _context.Subscribers.FindAsync(subscriberId);
+            if (subscriber == null)
+            {
+                return NotFound("Subscriber not found");
+            }
             var Subscriptions = await _context.Subscriptions
-                .Include(s=>s.Package)
+                .Include(s => s.Package)
                 .Where(s => s.IdSubscriber == subscriberId)
                 .ToListAsync();
-            List<SubscriberSubscriptionDto> SendingSubscriptions = new List<SubscriberSubscriptionDto>();
-                foreach(var subscription in Subscriptions)
-                {  var montant = subscription.MontantParCarte.HasValue ? subscription.MontantParCarte : subscription.Package.MontantBase;
-                    var formatdate =subscription.DateExpiration.HasValue ? UtilityDate.FormatDate((DateTime)subscription.DateExpiration) : null;
-                    var sendingsubscription = new SubscriberSubscriptionDto
-                    {
-                        Id = subscription.Id,
-                        NomPackage = subscription.Package.NomPackage,
-                        NbrCarteGenere= subscription.NbrCarteGenere,
-                        BudgetRestant = subscription.BudgetRestant,
-                        DateSouscription = subscription.DateSouscription,
-                        DateExpiration = formatdate,
-                        MontantParCarte = montant,
-                    };
-                    SendingSubscriptions.Add(sendingsubscription);
+            List<FullSubscriptionDto> SendingSubscriptions = new List<FullSubscriptionDto>();
+            foreach (var subscription in Subscriptions)
+            {
+                var montant = subscription.MontantParCarte.HasValue ? subscription.MontantParCarte : subscription.Package.MontantBase;
+                var formatdate = subscription.DateExpiration.HasValue ? UtilityDate.FormatDate((DateTime)subscription.DateExpiration) : null;
+                var sendingsubscription = new FullSubscriptionDto
+                {
+                    Id = subscription.Id,
+                    NomPackage = subscription.Package.NomPackage,
+                    NbrCarteGenere = subscription.NbrCarteGenere,
+                    BudgetRestant = subscription.BudgetRestant,
+                    DateSouscription = subscription.DateSouscription,
+                    DateExpiration = formatdate,
+                    MontantParCarte = montant,
+                };
+                SendingSubscriptions.Add(sendingsubscription);
 
-                }
-                return SendingSubscriptions;
+            }
+            return SendingSubscriptions;
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
@@ -80,14 +86,40 @@ namespace giftcard_api.Controllers
 
         [Authorize(Roles = "ADMIN")]
         [HttpGet("Package/{packageId}")]
-        public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptionsByPackage(int packageId)
+        public async Task<ActionResult<IEnumerable<FullSubscriptionDto>>> GetSubscriptionsByPackage(int packageId)
         {
-            return await _context.Subscriptions
-                                 .Where(s => s.IdPackage == packageId)
-                                 .ToListAsync();
+            var packages = await _context.Packages.FindAsync(packageId);
+            if(package==null)
+            {
+                return NotFound("Package not found");
+            }
+            var Subscriptions = await _context.Subscriptions
+                .Include(s => s.Package)
+                .Include(s => s.Subscriber)
+                .Where(s => s.IdPackage == packageId)
+                .ToListAsync();
+            List<FullSubscriptionDto> SendingSubscriptions = new List<FullSubscriptionDto>();
+            foreach (var subscription in Subscriptions)
+            {
+                var montant = subscription.MontantParCarte.HasValue ? subscription.MontantParCarte : subscription.Package.MontantBase;
+                var formatdate = subscription.DateExpiration.HasValue ? UtilityDate.FormatDate((DateTime)subscription.DateExpiration) : null;
+                var sendingsubscription = new FullSubscriptionDto
+                {
+                    Id = subscription.Id,
+                    NomPackage = subscription.Package.NomPackage,
+                    NomSubscriber = subscription.Subscriber.SubscriberName,
+                    NbrCarteGenere = subscription.NbrCarteGenere,
+                    BudgetRestant = subscription.BudgetRestant,
+                    DateSouscription = subscription.DateSouscription,
+                    DateExpiration = formatdate,
+                    MontantParCarte = montant,
+                };
+                SendingSubscriptions.Add(sendingsubscription);
+
+            }
+            return SendingSubscriptions;
         }
 
-        // Get: api/Subscription/{subscriberId}/{packageId}
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpPost]
@@ -137,7 +169,7 @@ namespace giftcard_api.Controllers
             _context.Entry(wallet).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetSubscription), new { Idsubscription = subscription.Id ,subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
+            return CreatedAtAction(nameof(GetSubscription), new { Idsubscription = subscription.Id, subscriberId = subscription.IdSubscriber, packageId = subscription.IdPackage }, subscription);
         }
         [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
