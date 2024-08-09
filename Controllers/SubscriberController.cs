@@ -25,7 +25,7 @@ namespace giftcard_api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Subscriber>>> GetSubscribers()
         {
-            return await _context.Subscribers.ToListAsync();
+            return await _context.Subscribers.Include(s=>s.SubscriberWallet).ToListAsync();
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
@@ -46,9 +46,9 @@ namespace giftcard_api.Controllers
         [HttpGet("ByUser/{iduser}")]
         public async Task<ActionResult<Subscriber>> GetSubscriberByUser(int iduser)
         {
-                var subscriber = await _context.Subscribers
-                .Include(s => s.SubscriberWallet)
-                .FirstOrDefaultAsync(sw => sw.IdUser == iduser);
+            var subscriber = await _context.Subscribers
+            .Include(s => s.SubscriberWallet)
+            .FirstOrDefaultAsync(sw => sw.IdUser == iduser);
             if (subscriber == null)
             {
                 return NotFound("Subscriber Not Found");
@@ -140,6 +140,30 @@ namespace giftcard_api.Controllers
             }
 
             return subscriberWallet;
+        }
+        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
+        [HttpPut("wallet/{idWallet}")]
+        public async Task<IActionResult> UpdateSubscriberWallet(int idWallet, [FromBody] WalletUpdateDto walletUpdateDto)
+        {
+            var wallet = await _context.SubscriberWallets.FindAsync(idWallet);
+            if (wallet == null)
+            {
+                return NotFound("Wallet Not Found");
+            }
+            wallet.Solde+=walletUpdateDto.Montant;
+
+            _context.Entry(wallet).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, "A problem occurred while updating the wallet.");
+            }
+
+            return NoContent();
         }
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
