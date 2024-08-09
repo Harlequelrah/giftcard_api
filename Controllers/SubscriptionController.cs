@@ -88,7 +88,7 @@ namespace giftcard_api.Controllers
         [HttpGet("Package/{packageId}")]
         public async Task<ActionResult<IEnumerable<FullSubscriptionDto>>> GetSubscriptionsByPackage(int packageId)
         {
-            var packages = await _context.Packages.FindAsync(packageId);
+            var package = await _context.Packages.FindAsync(packageId);
             if(package==null)
             {
                 return NotFound("Package not found");

@@ -495,7 +495,7 @@ namespace giftcard_api.Controllers
         [HttpGet("GetFormatedUsers")]
         public async Task<ActionResult<IEnumerable<FullUser>>> GetFormatedUsers()
         {
-            var users await _context.Users.Include(u=>u.Role).ToListAsync();
+            var users= await _context.Users.Include(u=>u.Role).ToListAsync();
             List<FullUser> fullusers = new List<FullUser>();
             foreach (var user in users)
             {
