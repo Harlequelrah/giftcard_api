@@ -141,30 +141,7 @@ namespace giftcard_api.Controllers
 
             return subscriberWallet;
         }
-        [Authorize(Roles = "SUBSCRIBER,ADMIN")]
-        [HttpPut("wallet/{idWallet}")]
-        public async Task<IActionResult> UpdateSubscriberWallet(int idWallet, [FromBody] WalletUpdateDto walletUpdateDto)
-        {
-            var wallet = await _context.SubscriberWallets.FindAsync(idWallet);
-            if (wallet == null)
-            {
-                return NotFound("Wallet Not Found");
-            }
-            wallet.Solde+=walletUpdateDto.Montant;
-
-            _context.Entry(wallet).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return StatusCode(500, "A problem occurred while updating the wallet.");
-            }
-
-            return NoContent();
-        }
+        
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("history/{idSubscriber}")]
