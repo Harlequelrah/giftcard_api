@@ -25,7 +25,7 @@ namespace giftcard_api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Merchant>>> GetMerchants()
         {
-            return await _context.Merchants.ToListAsync();
+            return await _context.Merchants.Include(s=>s.MerchantWallet).ToListAsync();
         }
 
         [HttpGet("{id}")]

@@ -7,6 +7,7 @@ namespace giftcard_api.Models
 {
     public class WalletUpdateDto
     {
+        public int Id { get; set; }
         public double Montant { get; set; }
     }
 }

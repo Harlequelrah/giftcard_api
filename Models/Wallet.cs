@@ -10,8 +10,6 @@ namespace giftcard_api.Models
         private double _solde = 0.0;
         private string _devise = "XOF";
 
-        // Propriétés publiques
-        [JsonIgnore]
         [Key]
         public int Id
         {
@@ -19,7 +17,7 @@ namespace giftcard_api.Models
             set => _id = value;
         }
 
-       
+
         public double Solde
         {
             get => _solde;

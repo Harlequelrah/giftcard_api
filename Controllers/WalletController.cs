@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using giftcard_api.Models;
+using giftcard_api.Services;
 using giftcard_api.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +23,60 @@ namespace giftcard_api.Controllers
             _context = context;
         }
 
-        [HttpPut("{idWallet}")]
-        public async Task<IActionResult> UpdateWallet(int idWallet, [FromBody] WalletUpdateDto walletUpdateDto)
+        [HttpPut("{type}/{idWallet}")]
+        public async Task<IActionResult> UpdateWallet(int idWallet, string type, [FromBody] WalletUpdateDto walletUpdateDto)
         {
-            var wallet = await _context.SubscriberWallets.FindAsync(idWallet);
+            Wallet wallet;
+            if (type == "subscriber")
+            {
+                var subscriberhistory = new SubscriberHistory
+                {
+                    Action = SubscriberHistory.SubscriberActions.MaintenanceSolde,
+                    IdSubscriber = walletUpdateDto.Id,
+                    Montant = walletUpdateDto.Montant,
+                    Date = UtilityDate.GetDate(),
+                };
+                _context.SubscriberHistories.Add(subscriberhistory);
+                await _context.SaveChangesAsync();
+                wallet = await _context.SubscriberWallets.FindAsync(idWallet);
+            }
+            else if (type == "beneficiary")
+            {
+                var beneficiaryhistory = new BeneficiaryHistory
+                {
+                    Action = BeneficiaryHistory.BeneficiaryActions.MaintenanceSolde,
+                    IdBeneficiary = walletUpdateDto.Id,
+                    Montant = walletUpdateDto.Montant,
+                    Date = UtilityDate.GetDate(),
+                };
+                _context.BeneficiaryHistories.Add(beneficiaryhistory);
+                await _context.SaveChangesAsync();
+                wallet = await _context.BeneficiaryWallets.FindAsync(idWallet);
+            }
+            else if (type == "merchant")
+            {
+                var merchanthistory = new MerchantHistory
+                {
+                    Action = MerchantHistory.MerchantActions.MaintenanceSolde,
+                    IdMerchant = walletUpdateDto.Id,
+                    Montant = walletUpdateDto.Montant,
+                    Date = UtilityDate.GetDate(),
+                };
+                _context.MerchantHistories.Add(merchanthistory);
+                await _context.SaveChangesAsync();
+
+                wallet = await _context.MerchantWallets.FindAsync(idWallet);
+            }
+            else
+            {
+                return BadRequest("Invalid Wallet Type");
+            }
+
             if (wallet == null)
             {
                 return NotFound("Wallet Not Found");
             }
-            wallet.Solde += walletUpdateDto.Montant;
+            wallet.Solde = walletUpdateDto.Montant;
 
             _context.Entry(wallet).State = EntityState.Modified;
 

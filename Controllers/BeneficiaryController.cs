@@ -25,7 +25,7 @@ namespace giftcard_api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Beneficiary>>> GetBeneficiaries()
         {
-            return await _context.Beneficiaries.ToListAsync();
+            return await _context.Beneficiaries.Include(s=>s.BeneficiaryWallet).ToListAsync();
         }
 
 

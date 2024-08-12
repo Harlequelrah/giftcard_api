@@ -37,6 +37,7 @@ namespace giftcard_api.Models
             Initial,
             Remboursement,
             Encaissement,
+            MaintenanceSolde,
         }
 
         private int _idMerchant;
@@ -58,6 +59,7 @@ namespace giftcard_api.Models
         public enum SubscriberActions
         {
             Initial,
+            MaintenanceSolde,
             Enregistrement,
             Souscription,
             PackageExpiration,
@@ -83,6 +85,7 @@ namespace giftcard_api.Models
             Initial,
             Depense,
             Recharge,
+            MaintenanceSolde,
         }
         private int _idBeneficiary;
         public int IdBeneficiary { get => _idBeneficiary; set => _idBeneficiary = value; }
