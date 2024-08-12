@@ -16,7 +16,7 @@ namespace giftcard_api.Models
         private string _prenom;
         private bool _has_gochap;
         private string _telephoneNumero;
-        private string? _profilPhoto;
+
 
         // Propriétés publiques
         [Key]
@@ -52,7 +52,7 @@ namespace giftcard_api.Models
         [ForeignKey("IdUser")]
         public User User { get; set; }
 
-        
+
         [ForeignKey("IdBeneficiaryWallet")]
         public BeneficiaryWallet BeneficiaryWallet { get; set; }
 
@@ -73,11 +73,7 @@ namespace giftcard_api.Models
             set => _telephoneNumero = value;
         }
 
-        public string? ProfilPhoto
-        {
-            get => _profilPhoto;
-            set => _profilPhoto = value;
-        }
+
         public Beneficiary()
         {
 

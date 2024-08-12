@@ -13,10 +13,10 @@ namespace giftcard_api.Models
         [Required]
         public string Telephone { get; set; }
         [Required]
-
         public string Password { get; set; }
         [Required]
         public string Adresse { get; set; }
+        public string? NomComplet { get; set; }
 
 
     }
@@ -26,6 +26,8 @@ namespace giftcard_api.Models
         public int Id { get; set; }
 
         public string? Email { get; set; }
+
+        public string? NomComplet { get; set; }
 
         public string? Telephone { get; set; }
 
@@ -41,6 +43,7 @@ namespace giftcard_api.Models
     {
         public int Id { get; set; }
 
+        public string NomComplet { get; set; }
         public string NomRole { get; set; }
         public string Email { get; set; }
         public string Telephone { get; set; }

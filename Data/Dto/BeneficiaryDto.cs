@@ -23,7 +23,6 @@ namespace giftcard_api.Data
         [Required]
         public string TelephoneNumero { get; set; }
 
-        public string? ProfilPhoto { get; set; }
 
     }
 }

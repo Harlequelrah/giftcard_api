@@ -13,17 +13,24 @@ namespace giftcard_api.Models
         private string _email;
         private string _password;
         private string _telephone;
+        private string? _nomcomplet;
         private string? _refreshToken;
         private DateTime? _refreshTokenExpiryTime;
         private string? _dateInscription;
         private string _adresse;
         private bool _isActive = true;
+        private string? _profilPhoto;
 
         [Key]
         public int Id
         {
             get => _id;
             set => _id = value;
+        }
+        public string? NomComplet
+        {
+            get => _nomcomplet;
+            set => _nomcomplet = value;
         }
 
         public int IdRole
@@ -85,6 +92,11 @@ namespace giftcard_api.Models
         {
             get => _isActive;
             set => _isActive = value;
+        }
+        public string? ProfilPhoto
+        {
+            get => _profilPhoto;
+            set => _profilPhoto = value;
         }
     }
 }

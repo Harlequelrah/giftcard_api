@@ -52,6 +52,7 @@ namespace giftcard_api.Controllers
                     var user = new User
                     {
                         IdRole = 4,
+                        NomComplet = userdto.NomComplet,
                         Email = userdto.Email,
                         Password = hashedPassword,
                         Adresse = userdto.Adresse,
@@ -100,6 +101,7 @@ namespace giftcard_api.Controllers
                     var user = new User
                     {
                         Email = userdto.Email,
+                        NomComplet = userdto.NomComplet,
                         Password = hashedPassword,
                         Adresse = userdto.Adresse,
                         Telephone = userdto.Telephone,
@@ -148,6 +150,7 @@ namespace giftcard_api.Controllers
                         IdRole = 2,
                         Email = subscriberdto.Email,
                         Password = hashedPassword,
+                        NomComplet= subscriberdto.SubscriberName,
                         Adresse = subscriberdto.Adresse,
                         Telephone = subscriberdto.Telephone,
                         DateInscription = UtilityDate.GetDate(),
@@ -209,10 +212,12 @@ namespace giftcard_api.Controllers
                         });
                     }
                     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(merchantdto.Password);
+                    var nomcomplet = $"{merchantdto.Nom} {merchantdto.Prenom}";
                     var user = new User
                     {
                         IdRole = 3,
                         Email = merchantdto.Email,
+                        NomComplet = nomcomplet,
                         Password = hashedPassword,
                         Adresse = merchantdto.Adresse,
                         Telephone = merchantdto.Telephone,
@@ -504,6 +509,7 @@ namespace giftcard_api.Controllers
                     Id = user.Id,
                     Email = user.Email,
                     Telephone = user.Telephone,
+                    NomComplet = user.NomComplet,
                     Adresse = user.Adresse,
                     DateInscription=user.DateInscription,
                     IsActive=user.IsActive,
@@ -583,6 +589,7 @@ namespace giftcard_api.Controllers
             var hashedPassword = user.Password != null ? BCrypt.Net.BCrypt.HashPassword(user.Password) : existinguser.Password;
             existinguser.Email = user.Email?? existinguser.Email;
             existinguser.Password = hashedPassword;
+            existinguser.NomComplet = user.NomComplet ?? existinguser.NomComplet;
             existinguser.Adresse = user.Adresse ?? existinguser.Adresse;
             existinguser.Telephone = user.Telephone ?? existinguser.Telephone;
             existinguser.IsActive = user.IsActive;
