@@ -10,22 +10,25 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
+    [Authorize(Roles="MERCHANT,ADMIN")]
     [Route("api/[controller]")]
     [ApiController]
     public class MerchantController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly JwtService _jwtService;
 
-        public MerchantController(ApplicationDbContext context)
+        public MerchantController(ApplicationDbContext context, JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Merchant>>> GetMerchants()
         {
-            return await _context.Merchants.Include(s=>s.MerchantWallet).ToListAsync();
+            return await _context.Merchants.Include(s => s.MerchantWallet).ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -134,12 +137,24 @@ namespace giftcard_api.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 try
                 {
+                    if (!_jwtService.ValidateTokenWithoutExpiration(payementdto.Token)) return BadRequest("Le token est invalide");
+                    var claims = _jwtService.ParseJwtToken(payementdto.Token);
+                    int IdBeneficiary;
+                    var IdBeneficiaryClaim = claims.FirstOrDefault(c => c.Key == "nameid");
+                    if (!string.IsNullOrEmpty(IdBeneficiaryClaim.Value) && int.TryParse(IdBeneficiaryClaim.Value, out int id))
+                    {
+                        IdBeneficiary = id;
+                    }
+                    else
+                    {
+                        return NotFound("Utilisateur Non trouvé");
+                    }
                     var beneficiary = await _context.Beneficiaries
                         .Include(b => b.BeneficiaryWallet)
-                        .FirstOrDefaultAsync(u => u.Id == payementdto.IdBeneficiary);
-
+                        .FirstOrDefaultAsync(u => u.Id == IdBeneficiary);
                     if (beneficiary == null)
                     {
                         return NotFound("beneficiary Not Found");
@@ -195,17 +210,17 @@ namespace giftcard_api.Controllers
                         _context.BeneficiaryHistories.Add(beneficiaryHistory);
                         await _context.SaveChangesAsync();
                     }
-                    return Ok(new {  beneficiaryWallet,merchantHistory,merchantWallet });
+                    return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet });
 
                 }
 
                 catch (Exception ex)
                 {
-                // Log l'exception et retournez une réponse d'erreur appropriée
-                return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
             }
-        }
             return BadRequest(ModelState);
+        }
     }
-}
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using giftcard_api.Models;
+using giftcard_api.Services;
 using giftcard_api.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,12 @@ namespace giftcard_api.Controllers
     public class BeneficiaryController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly JwtService _jwtService;
 
-        public BeneficiaryController(ApplicationDbContext context)
+        public BeneficiaryController(ApplicationDbContext context,JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
 
@@ -40,6 +43,54 @@ namespace giftcard_api.Controllers
             }
 
             return beneficiary;
+        }
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<BeneficiaryUser>> GetBeneficiaryUser(int id)
+        {
+            var beneficiary = await _context.Beneficiaries
+                .Include(b => b.BeneficiaryWallet)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Utilisateur Non Trouvé");
+            }
+            if (beneficiary == null)
+            {
+                return NotFound("Beneficiaire Non Trouvé");
+            }
+            var solde = $"{beneficiary.BeneficiaryWallet.Solde} {beneficiary.BeneficiaryWallet.Devise}";
+            var beneficiaryuser = new BeneficiaryUser()
+            {
+                IdBeneficiary= beneficiary.Id,
+                NomComplet=user.NomComplet,
+                Solde=solde,
+                Email=user.Email
+            };
+            return beneficiaryuser;
+        }
+        [Authorize(Roles="BENEFICIARY")]
+        [HttpGet("Token/{id}")]
+        public async Task<IActionResult> GetBeneficiaryToken(int id)
+        {
+            var beneficiary = await _context.Beneficiaries.FindAsync(id);
+
+            if (beneficiary == null)
+            {
+                return NotFound();
+            }
+            try{
+                string token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
+                return Ok(new { Token = token });
+            }
+
+                catch (Exception ex)
+                {
+                    // Log l'exception et retournez une réponse d'erreur appropriée
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
+
+
         }
 
 

@@ -5,9 +5,9 @@ namespace giftcard_api.Data
 {
     public class PayementDto
     {
-
         [Required]
-        public int IdBeneficiary { get; set; }
+        public string Token { get; set; }
+
         [Required]
         public double Montant { get; set; }
     }
