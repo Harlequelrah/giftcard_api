@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace giftcard_api.Controllers
 {
-
+    [Authorize(Policy = "IsActive")]
     [Authorize(Roles="ADMIN")]
     [Route("api/[controller]")]
     [ApiController]

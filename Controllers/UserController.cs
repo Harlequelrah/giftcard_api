@@ -27,7 +27,7 @@ namespace giftcard_api.Controllers
             _configuration = configuration;
             _jwtService = jwtService;
         }
-
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/admin")]
         public async Task<IActionResult> RegisterAdmin(UserDto userdto)
@@ -262,6 +262,7 @@ namespace giftcard_api.Controllers
 
             return BadRequest(ModelState);
         }
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "SUBSCRIBER")]
         [HttpPost("register/beneficiary/bysubscriber/{idsubscriber}/value/{amount}")]
         public async Task<IActionResult> RegisterBeneficiary(int idsubscriber, double? amount, BeneficiaryDto beneficiarydto)
@@ -447,7 +448,7 @@ namespace giftcard_api.Controllers
                 var refreshToken = _jwtService.GenerateRefreshToken();
                 _jwtService.SaveRefreshToken(existingUser, refreshToken);
 
-                return Ok(new { Token = token, user });
+                return Ok(new { Token = token});
             }
 
             return Unauthorized("Email ou mot de passe incorrect.");
@@ -489,13 +490,14 @@ namespace giftcard_api.Controllers
         {
             public string RefreshToken { get; set; }
         }
-
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet("GetFormatedUsers")]
         public async Task<ActionResult<IEnumerable<FullUser>>> GetFormatedUsers()
@@ -519,6 +521,7 @@ namespace giftcard_api.Controllers
             }
             return fullusers;
         }
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("GetIdSubscriber/{id}")]
         public async Task<ActionResult<int>> GetIdSusbcriber(int id)
@@ -533,6 +536,7 @@ namespace giftcard_api.Controllers
                 return NotFound();
             }
         }
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet("byrole/{idRole}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(int? idRole)
@@ -549,6 +553,7 @@ namespace giftcard_api.Controllers
 
             return Ok(usersByRole);
         }
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet("byIsActive/{isActive}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByActivity(bool isActive)
@@ -564,7 +569,7 @@ namespace giftcard_api.Controllers
 
             return Ok(usersByActivity);
         }
-
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
@@ -577,6 +582,7 @@ namespace giftcard_api.Controllers
             return user;
         }
 
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserUpdateDto user)
@@ -618,7 +624,7 @@ namespace giftcard_api.Controllers
             return NoContent();
 
         }
-
+        [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)

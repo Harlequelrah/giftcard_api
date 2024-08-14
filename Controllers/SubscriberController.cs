@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
+    [Authorize(Policy = "IsActive")]
     [Route("api/[controller]")]
     [ApiController]
     public class SubscriberController : ControllerBase
@@ -141,7 +142,7 @@ namespace giftcard_api.Controllers
 
             return subscriberWallet;
         }
-        
+
 
         [Authorize(Roles = "SUBSCRIBER,ADMIN")]
         [HttpGet("history/{idSubscriber}")]

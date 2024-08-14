@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
+    [Authorize(Policy = "IsActive")]
     [Route("api/[controller]")]
     [ApiController]
     public class SubscriptionController : ControllerBase
