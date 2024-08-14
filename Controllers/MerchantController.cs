@@ -237,7 +237,7 @@ namespace giftcard_api.Controllers
             {
                 return NotFound("Marchand Non Trouvé");
             }
-            var solde = $"{merchant.MerchantWallet.Solde} {merchant.MerchantWallet.Devise}";
+            var solde = $"{merchant.MerchantWallet.Devise} {merchant.MerchantWallet.Solde} ";
             var beneficiaryuser = new AppUser()
             {
                 SpecialId= merchant.Id,

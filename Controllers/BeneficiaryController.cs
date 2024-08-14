@@ -61,7 +61,7 @@ namespace giftcard_api.Controllers
             {
                 return NotFound("Beneficiaire Non Trouvé");
             }
-            var solde = $"{beneficiary.BeneficiaryWallet.Solde} {beneficiary.BeneficiaryWallet.Devise}";
+            var solde = $"{beneficiary.BeneficiaryWallet.Devise} {beneficiary.BeneficiaryWallet.Solde}";
             var beneficiaryuser = new AppUser()
             {
                 SpecialId= beneficiary.Id,
