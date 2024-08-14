@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
+    [Authorize(Roles="BENEFICIARY,SUBSCRIBER,MERCHANT")]
     [Route("api/[controller]")]
     [ApiController]
     public class BeneficiaryController : ControllerBase
@@ -44,8 +45,9 @@ namespace giftcard_api.Controllers
 
             return beneficiary;
         }
+
         [HttpGet("User/{id}")]
-        public async Task<ActionResult<BeneficiaryUser>> GetBeneficiaryUser(int id)
+        public async Task<ActionResult<AppUser>> GetBeneficiaryUser(int id)
         {
             var beneficiary = await _context.Beneficiaries
                 .Include(b => b.BeneficiaryWallet)
@@ -60,16 +62,15 @@ namespace giftcard_api.Controllers
                 return NotFound("Beneficiaire Non Trouvé");
             }
             var solde = $"{beneficiary.BeneficiaryWallet.Solde} {beneficiary.BeneficiaryWallet.Devise}";
-            var beneficiaryuser = new BeneficiaryUser()
+            var beneficiaryuser = new AppUser()
             {
-                IdBeneficiary= beneficiary.Id,
+                SpecialId= beneficiary.Id,
                 NomComplet=user.NomComplet,
                 Solde=solde,
                 Email=user.Email
             };
             return beneficiaryuser;
         }
-        [Authorize(Roles="BENEFICIARY")]
         [HttpGet("Token/{id}")]
         public async Task<IActionResult> GetBeneficiaryToken(int id)
         {

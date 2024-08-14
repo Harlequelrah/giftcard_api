@@ -222,5 +222,30 @@ namespace giftcard_api.Controllers
             }
             return BadRequest(ModelState);
         }
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<AppUser>> GetMerchantUser(int id)
+        {
+            var merchant = await _context.Merchants
+                .Include(b => b.MerchantWallet)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Utilisateur Non Trouvé");
+            }
+            if (merchant == null)
+            {
+                return NotFound("Marchand Non Trouvé");
+            }
+            var solde = $"{merchant.MerchantWallet.Solde} {merchant.MerchantWallet.Devise}";
+            var beneficiaryuser = new AppUser()
+            {
+                SpecialId= merchant.Id,
+                NomComplet=user.NomComplet,
+                Solde=solde,
+                Email=user.Email
+            };
+            return beneficiaryuser;
+        }
     }
 }

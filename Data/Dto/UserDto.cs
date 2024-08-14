@@ -52,9 +52,9 @@ namespace giftcard_api.Models
         public bool IsActive { get; set; }
 
     }
-    public class BeneficiaryUser
+    public class AppUser
     {
-        public int IdBeneficiary { get; set; }
+        public int SpecialId{ get; set; }
         public string NomComplet { get; set; }
         public string Email { get; set; }
         public string Solde { get; set; }
