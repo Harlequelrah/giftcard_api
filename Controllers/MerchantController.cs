@@ -142,11 +142,11 @@ namespace giftcard_api.Controllers
                 {
                     if (!_jwtService.ValidateTokenWithoutExpiration(payementdto.Token)) return BadRequest("Le token est invalide");
                     var claims = _jwtService.ParseJwtToken(payementdto.Token);
-                    int IdBeneficiary;
-                    var IdBeneficiaryClaim = claims.FirstOrDefault(c => c.Key == "nameid");
-                    if (!string.IsNullOrEmpty(IdBeneficiaryClaim.Value) && int.TryParse(IdBeneficiaryClaim.Value, out int id))
+                    int IdUser;
+                    var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
+                    if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
                     {
-                        IdBeneficiary = id;
+                        IdUser = id;
                     }
                     else
                     {
@@ -154,7 +154,7 @@ namespace giftcard_api.Controllers
                     }
                     var beneficiary = await _context.Beneficiaries
                         .Include(b => b.BeneficiaryWallet)
-                        .FirstOrDefaultAsync(u => u.Id == IdBeneficiary);
+                        .FirstOrDefaultAsync(u => u.Id == IdUser);
                     if (beneficiary == null)
                     {
                         return NotFound("beneficiary Not Found");

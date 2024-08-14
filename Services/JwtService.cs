@@ -44,27 +44,6 @@ namespace giftcard_api.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public async Task<string> GenerateBeneficiaryToken(Beneficiary beneficiary)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var NomComplet = $"{beneficiary.Nom} {beneficiary.Prenom}";
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                new Claim(ClaimTypes.NameIdentifier, beneficiary.Id.ToString()),
-                new Claim(ClaimTypes.Name,NomComplet),
-                new Claim("Has_gochap",beneficiary.Has_gochap.ToString()),
-            }),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Audience = _configuration["Jwt:Audience"],
-                Issuer = _configuration["Jwt:Issuer"]
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];

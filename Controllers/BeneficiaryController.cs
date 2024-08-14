@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace giftcard_api.Controllers
 {
-    [Authorize(Roles="BENEFICIARY,SUBSCRIBER,MERCHANT")]
+    // [Authorize(Roles="BENEFICIARY,SUBSCRIBER,MERCHANT")]
     [Route("api/[controller]")]
     [ApiController]
     public class BeneficiaryController : ControllerBase
@@ -71,30 +71,6 @@ namespace giftcard_api.Controllers
             };
             return beneficiaryuser;
         }
-        [HttpGet("Token/{id}")]
-        public async Task<IActionResult> GetBeneficiaryToken(int id)
-        {
-            var beneficiary = await _context.Beneficiaries.FindAsync(id);
-
-            if (beneficiary == null)
-            {
-                return NotFound();
-            }
-            try{
-                string token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
-                return Ok(new { Token = token });
-            }
-
-                catch (Exception ex)
-                {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
-                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
-                }
-
-
-        }
-
-
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBeneficiary(int id, Beneficiary beneficiary)
         {
