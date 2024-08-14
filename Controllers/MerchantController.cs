@@ -228,7 +228,7 @@ namespace giftcard_api.Controllers
         {
             var merchant = await _context.Merchants
                 .Include(b => b.MerchantWallet)
-                .FirstOrDefaultAsync(b => b.Id == id);
+                .FirstOrDefaultAsync(b => b.IdUser == id);
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {

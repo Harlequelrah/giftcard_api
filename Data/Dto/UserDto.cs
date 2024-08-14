@@ -16,6 +16,7 @@ namespace giftcard_api.Models
         public string Password { get; set; }
         [Required]
         public string Adresse { get; set; }
+        [Required]
         public string NomComplet { get; set; }
 
 

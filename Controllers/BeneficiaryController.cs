@@ -52,7 +52,7 @@ namespace giftcard_api.Controllers
         {
             var beneficiary = await _context.Beneficiaries
                 .Include(b => b.BeneficiaryWallet)
-                .FirstOrDefaultAsync(b => b.Id == id);
+                .FirstOrDefaultAsync(b => b.IdUser == id);
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
