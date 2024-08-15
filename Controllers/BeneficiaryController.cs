@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace giftcard_api.Controllers
 {
     [Authorize(Policy = "IsActive")]
-    [Authorize(Roles="BENEFICIARY,SUBSCRIBER,MERCHANT")]
+    [Authorize(Roles="BENEFICIARY,SUBSCRIBER,ADMIN")]
     [Route("api/[controller]")]
     [ApiController]
     public class BeneficiaryController : ControllerBase
