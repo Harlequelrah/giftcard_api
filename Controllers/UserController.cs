@@ -472,12 +472,27 @@ namespace giftcard_api.Controllers
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshRequest.RefreshToken);
+            var token = refreshRequest.Token;
+                    if (!_jwtService.ValidateTokenWithoutExpiration(token))
+                    {
+                        return BadRequest("Le token est invalide");
+                    }
+                    var claims = _jwtService.ParseJwtToken(token);
+                    int IdUser;
+                    var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
+                    if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
+                    {
+                        IdUser = id;
+                    }
+                    else
+                    {
+                        return NotFound("Utilisateur Non trouvé");
+                    }
+            var user = await _context.Users.FindAsync(IdUser);
             if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 return Unauthorized("Invalid refresh token.");
             }
-
             // Génération du nouveau token
             var newToken = await _jwtService.GenerateToken(user);
             var newRefreshToken = _jwtService.GenerateRefreshToken();
@@ -486,10 +501,7 @@ namespace giftcard_api.Controllers
             return Ok(new { Token = newToken });
         }
 
-        public class RefreshRequest
-        {
-            public string RefreshToken { get; set; }
-        }
+
         [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpGet]
