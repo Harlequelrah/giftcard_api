@@ -443,6 +443,10 @@ namespace giftcard_api.Controllers
                 {
                     return Unauthorized(new { message = "Email ou mot de passe incorrect." });
                 }
+                if(existingUser.IsActive==false)
+                {
+                    return Unauthorized("L'utilisateur est désactivé.");
+                }
                 // Générez un jeton JWT pour l'utilisateur authentifié
                 var token = await _jwtService.GenerateToken(existingUser);
                 var refreshToken = _jwtService.GenerateRefreshToken();
