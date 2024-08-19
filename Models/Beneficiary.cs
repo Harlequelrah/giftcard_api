@@ -14,6 +14,8 @@ namespace giftcard_api.Models
         private int _idBeneficiaryWallet;
         private string _nom;
         private string _prenom;
+
+        private string _email;
         private bool _has_gochap;
         private string _telephoneNumero;
 
@@ -29,6 +31,12 @@ namespace giftcard_api.Models
         {
             get => _has_gochap;
             set => _has_gochap = value;
+        }
+
+        public string Email
+        {
+            get =>_email;
+            set => _email = value;
         }
 
         public int? IdUser

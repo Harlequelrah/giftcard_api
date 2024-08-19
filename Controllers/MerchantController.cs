@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace giftcard_api.Controllers
 {
     [Authorize(Policy = "IsActive")]
-    [Authorize(Roles="MERCHANT,ADMIN")]
+    [Authorize(Roles = "MERCHANT,ADMIN")]
     [Route("api/[controller]")]
     [ApiController]
     public class MerchantController : ControllerBase
@@ -144,18 +144,32 @@ namespace giftcard_api.Controllers
                     if (!_jwtService.ValidateTokenWithoutExpiration(payementdto.Token)) return BadRequest("Le token est invalide");
                     var claims = _jwtService.ParseJwtToken(payementdto.Token);
                     int IdUser;
+                    int IdBeneficiary;
+                    Beneficiary beneficiary = new Beneficiary();
                     var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
                     if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
                     {
                         IdUser = id;
+                        beneficiary = await _context.Beneficiaries
+                        .Include(b => b.BeneficiaryWallet)
+                        .FirstOrDefaultAsync(u => u.IdUser == IdUser);
                     }
                     else
                     {
-                        return NotFound("Utilisateur Non trouvé");
-                    }
-                    var beneficiary = await _context.Beneficiaries
+                        var IdBeneficiaryClaim = claims.FirstOrDefault(c => c.Key == "beneficiaryid");
+                        if (!string.IsNullOrEmpty(IdBeneficiaryClaim.Value) && int.TryParse(IdBeneficiaryClaim.Value, out int idbef))
+                        {
+                            IdBeneficiary = idbef;
+                            beneficiary = await _context.Beneficiaries
                         .Include(b => b.BeneficiaryWallet)
-                        .FirstOrDefaultAsync(u => u.Id == IdUser);
+                        .FirstOrDefaultAsync(u => u.Id == IdBeneficiary);
+                        }
+                        else
+                        {
+                            return NotFound("Beneficiaire Non trouvé");
+                        }
+                    }
+
                     if (beneficiary == null)
                     {
                         return NotFound("beneficiary Not Found");
@@ -241,10 +255,10 @@ namespace giftcard_api.Controllers
             var solde = $"{merchant.MerchantWallet.Devise} {merchant.MerchantWallet.Solde} ";
             var beneficiaryuser = new AppUser()
             {
-                SpecialId= merchant.Id,
-                NomComplet=user.NomComplet,
-                Solde=solde,
-                Email=user.Email
+                SpecialId = merchant.Id,
+                NomComplet = user.NomComplet,
+                Solde = solde,
+                Email = user.Email
             };
             return beneficiaryuser;
         }

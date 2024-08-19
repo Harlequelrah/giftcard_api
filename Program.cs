@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using giftcard_api.Models;
 using giftcard_api.Data;
-
+using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using giftcard_api.Services;
@@ -25,8 +25,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     });
 
-
-
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

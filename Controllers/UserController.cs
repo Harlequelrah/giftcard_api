@@ -19,13 +19,15 @@ namespace giftcard_api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly JwtService _jwtService;
         private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
 
 
-        public UserController(ApplicationDbContext context, JwtService jwtService, IConfiguration configuration)
+        public UserController(ApplicationDbContext context, JwtService jwtService, IConfiguration configuration,EmailService emailService)
         {
             _context = context;
             _configuration = configuration;
             _jwtService = jwtService;
+            _emailService = emailService;
         }
         [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
@@ -359,6 +361,7 @@ namespace giftcard_api.Controllers
                             IdUser = existingUser.Id,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
+                            Email = beneficiarydto.Email,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
                             TelephoneNumero = beneficiarydto.TelephoneNumero
@@ -408,12 +411,16 @@ namespace giftcard_api.Controllers
                             IdUser = null,
                             IdBeneficiaryWallet = beneficiaryWallet.Id,
                             Nom = beneficiarydto.Nom,
+                            Email = beneficiarydto.Email,
                             Prenom = beneficiarydto.Prenom,
                             Has_gochap = beneficiarydto.Has_gochap,
                             TelephoneNumero = beneficiarydto.TelephoneNumero
                         };
                         _context.Beneficiaries.Add(beneficiary);
                         await _context.SaveChangesAsync();
+                        var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
+                        var email = beneficiarydto.Email;
+                        var emailresponse = await _emailService.SendEmailAsync(email,token);
                         return Ok(new { beneficiary, Montant = cartecadeau });
                     }
 
