@@ -420,7 +420,8 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
                         var email = beneficiarydto.Email;
-                        var emailresponse = await _emailService.SendEmailAsync(email,token);
+                        var cartemontant = $"{cartecadeau}";
+                        var emailresponse = await _emailService.SendEmailAsync(email,token,cartemontant);
                         return Ok(new { beneficiary, Montant = cartecadeau });
                     }
 
