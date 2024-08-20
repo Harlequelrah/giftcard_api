@@ -12,8 +12,8 @@ using giftcard_api.Data;
 namespace giftcard_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240726125321_init")]
-    partial class init
+    [Migration("20240819224625_debutdestests")]
+    partial class debutdestests
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace giftcard_api.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("Has_gochap")
                         .HasColumnType("tinyint(1)");
@@ -53,8 +57,9 @@ namespace giftcard_api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("ProfilePhoto")
-                        .HasColumnType("longblob");
+                    b.Property<string>("TelephoneNumero")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -137,9 +142,6 @@ namespace giftcard_api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("ProfilePhoto")
-                        .HasColumnType("longblob");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdMerchantWallet");
@@ -213,9 +215,6 @@ namespace giftcard_api.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int?>("MaxCarte")
-                        .HasColumnType("int");
 
                     b.Property<double>("MontantBase")
                         .HasColumnType("double");
@@ -389,14 +388,20 @@ namespace giftcard_api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("IdRole")
+                    b.Property<int>("IdRole")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("NomComplet")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProfilPhoto")
                         .HasColumnType("longtext");
 
                     b.Property<string>("RefreshToken")
@@ -527,7 +532,9 @@ namespace giftcard_api.Migrations
                 {
                     b.HasOne("giftcard_api.Models.Role", "Role")
                         .WithMany()
-                        .HasForeignKey("IdRole");
+                        .HasForeignKey("IdRole")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
                 });

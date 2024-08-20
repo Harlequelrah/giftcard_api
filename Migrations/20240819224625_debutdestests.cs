@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace giftcard_api.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class debutdestests : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,7 +58,6 @@ namespace giftcard_api.Migrations
                     NbrJour = table.Column<int>(type: "int", nullable: true),
                     Budget = table.Column<double>(type: "double", nullable: false),
                     Prix = table.Column<double>(type: "double", nullable: false),
-                    MaxCarte = table.Column<int>(type: "int", nullable: true),
                     MontantBase = table.Column<double>(type: "double", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
@@ -106,7 +105,9 @@ namespace giftcard_api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    IdRole = table.Column<int>(type: "int", nullable: true),
+                    NomComplet = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdRole = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Telephone = table.Column<string>(type: "longtext", nullable: false)
@@ -120,7 +121,9 @@ namespace giftcard_api.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Adresse = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ProfilPhoto = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -129,7 +132,8 @@ namespace giftcard_api.Migrations
                         name: "FK_Users_Roles_IdRole",
                         column: x => x.IdRole,
                         principalTable: "Roles",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -140,6 +144,8 @@ namespace giftcard_api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Has_gochap = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Email = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     IdUser = table.Column<int>(type: "int", nullable: true),
                     IdSubscriber = table.Column<int>(type: "int", nullable: false),
                     IdBeneficiaryWallet = table.Column<int>(type: "int", nullable: false),
@@ -147,7 +153,8 @@ namespace giftcard_api.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Prenom = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true)
+                    TelephoneNumero = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -177,8 +184,7 @@ namespace giftcard_api.Migrations
                     Nom = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Prenom = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfilePhoto = table.Column<byte[]>(type: "longblob", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

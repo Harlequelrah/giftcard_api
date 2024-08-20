@@ -543,6 +543,7 @@ namespace giftcard_api.Controllers
                 });
 
             }
+            fullusers.Sort((u1, u2) => u1.Id.CompareTo(u2.Id));
             return fullusers;
         }
         [Authorize(Policy = "IsActive")]

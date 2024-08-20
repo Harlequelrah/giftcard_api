@@ -57,12 +57,13 @@ namespace giftcard_api.Services
                                 new EmailAddress { Email = email }
                             },
                             Subject = "Vous avez reçu une Carte Cadeau !",
-                            Text = $@"
+                            Html = $@"
                                 Félicitations ! Vous venez de recevoir une carte cadeau sous forme de QR code d'une valeur de {montant} XOF.
                                 Dans le but de fidéliser sa clientèle, GoChap lance sa toute dernière innovation.
                                 Cette carte cadeau vous permet d'opérer des achats auprès de nos marchands qui acceptent le paiement par carte cadeau.
-
-                                <img src='{qrCodeImageSrc}' alt='QR Code' />
+                                <div style='text-align:center; margin:10px 0;'>
+                                <img src='{qrCodeImageSrc}' alt='QR Code' style='max-width:30%; height:auto;' />
+                                </div>
                             ",
                             Category = "Envoi de Carte Cadeau"
                         };
@@ -105,7 +106,7 @@ namespace giftcard_api.Services
         public EmailAddress From { get; set; }
         public List<EmailAddress> To { get; set; }
         public string Subject { get; set; }
-        public string Text { get; set; }
+        public string Html { get; set; }
         public string Category { get; set; }
     }
 }
