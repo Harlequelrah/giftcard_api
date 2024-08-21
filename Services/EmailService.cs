@@ -23,7 +23,7 @@ namespace giftcard_api.Services
             _httpClient = httpClient;
             _configuration = configuration;
         }
-        public async Task<bool> SendPayementEmailAsync(string email,string montant,string marchand)
+        public async Task<bool> SendPayementEmailAsync(string email,string montant,string marchand,string solderestant)
         {
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
@@ -39,9 +39,12 @@ namespace giftcard_api.Services
                                 new EmailAddress { Email = email }
                             },
                             Subject = "Vous avez effectué un achat par Carte Cadeau !",
-                            Text = $@"
-                            Vous venez d'effectuer un achat par Carte Cadeau d'un montant de {montant} auprès du marchant {marchand};
-                            Si vous n'êtes pas l'auteur de cet achat .Veuillez concactez le Support Gochap par email à info@gochap.solutions
+                            Html = $@"
+                            <div style='text-align:justify; margin:10px 0;justify-content:center;'>
+                            Vous venez d'effectuer un achat par Carte Cadeau d'un montant de {montant} auprès du marchant {marchand};</br>
+                            Votre solde de carte cadeau restant est de {solderestant} XOF.</br>
+                            Si vous n'êtes pas l'auteur de cet achat.Veuillez concactez le Support Gochap par email à info@gochap.solutions .
+                            </div>
                             ",
                             Category = "Envoi de Confirmation d'Achat"
                         };
@@ -150,8 +153,7 @@ namespace giftcard_api.Services
         public EmailAddress From { get; set; }
         public List<EmailAddress> To { get; set; }
         public string Subject { get; set; }
-        public string? Html { get; set; }
-        public string? Text { get; set; }
+        public string Html { get; set; }
         public string Category { get; set; }
     }
 }

@@ -147,6 +147,7 @@ namespace giftcard_api.Controllers
                     var claims = _jwtService.ParseJwtToken(payementdto.Token);
                     int IdUser;
                     int IdBeneficiary;
+                    var emailresponse = false;
 
                     Beneficiary beneficiary = new Beneficiary();
                     var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
@@ -217,7 +218,7 @@ namespace giftcard_api.Controllers
                     _context.MerchantHistories.Add(merchantHistory);
 
                     await _context.SaveChangesAsync();
-                    var emailresponse = false;
+
                     if (beneficiary.Has_gochap)
                     {
                         var beneficiaryHistory = new BeneficiaryHistory
@@ -229,8 +230,12 @@ namespace giftcard_api.Controllers
                         };
                         _context.BeneficiaryHistories.Add(beneficiaryHistory);
                         await _context.SaveChangesAsync();
-                        emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email,$"payementdto.Montant",$"merchant.Nom merchant.Prenom");
+
                     }
+                    var montantAchat =$"{payementdto.Montant}";
+                    var nomMarchand=$"{merchant.Nom} {merchant.Prenom}";
+                    var soldeRestant =$"{beneficiaryWallet.Solde}";
+                    emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email,montantAchat,nomMarchand,soldeRestant);
                     return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet,EmailResponse = emailresponse });
 
                 }
