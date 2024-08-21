@@ -422,7 +422,7 @@ namespace giftcard_api.Controllers
                         var email = beneficiarydto.Email;
                         var cartemontant = $"{cartecadeau}";
                         var emailresponse = await _emailService.SendEmailAsync(email,token,cartemontant);
-                        return Ok(new { beneficiary, Montant = cartecadeau });
+                        return Ok(new { beneficiary, Montant = cartecadeau ,Emailresponse=emailresponse});
                     }
 
                 }

@@ -23,6 +23,50 @@ namespace giftcard_api.Services
             _httpClient = httpClient;
             _configuration = configuration;
         }
+        public async Task<bool> SendPayementEmailAsync(string email,string montant,string marchand)
+        {
+            var url = _configuration["SendMailAPI:Url"];
+            var token = _configuration["SendMailAPI:Token"];
+            var emailMessage = new EmailMessage
+                        {
+                            From = new EmailAddress
+                            {
+                                Email = "info@gochap.solutions",
+                                Name = "GoChap"
+                            },
+                            To = new List<EmailAddress>
+                            {
+                                new EmailAddress { Email = email }
+                            },
+                            Subject = "Vous avez effectué un achat par Carte Cadeau !",
+                            Text = $@"
+                            Vous venez d'effectuer un achat par Carte Cadeau d'un montant de {montant} auprès du marchant {marchand};
+                            Si vous n'êtes pas l'auteur de cet achat .Veuillez concactez le Support Gochap par email à info@gochap.solutions
+                            ",
+                            Category = "Envoi de Confirmation d'Achat"
+                        };
+                    var jsonContent = JsonSerializer.Serialize(emailMessage);
+                        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                        // Ajout du token d'authentification
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                        // Envoi de la requête POST
+                        var response = await _httpClient.PostAsync(url, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            Console.WriteLine($"Email sent successfully: {responseContent}");
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                            return false;
+                        }
+
+        }
 
         public async Task<bool> SendEmailAsync(string email, string qrCodeToken, string montant)
         {
@@ -106,7 +150,8 @@ namespace giftcard_api.Services
         public EmailAddress From { get; set; }
         public List<EmailAddress> To { get; set; }
         public string Subject { get; set; }
-        public string Html { get; set; }
+        public string? Html { get; set; }
+        public string? Text { get; set; }
         public string Category { get; set; }
     }
 }

@@ -18,11 +18,13 @@ namespace giftcard_api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtService _jwtService;
+         private readonly EmailService _emailService;
 
-        public MerchantController(ApplicationDbContext context, JwtService jwtService)
+        public MerchantController(ApplicationDbContext context, JwtService jwtService,EmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
 
@@ -145,6 +147,7 @@ namespace giftcard_api.Controllers
                     var claims = _jwtService.ParseJwtToken(payementdto.Token);
                     int IdUser;
                     int IdBeneficiary;
+
                     Beneficiary beneficiary = new Beneficiary();
                     var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
                     if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
@@ -212,7 +215,9 @@ namespace giftcard_api.Controllers
                         Action = MerchantHistory.MerchantActions.Encaissement,
                     };
                     _context.MerchantHistories.Add(merchantHistory);
+
                     await _context.SaveChangesAsync();
+                    var emailresponse = false;
                     if (beneficiary.Has_gochap)
                     {
                         var beneficiaryHistory = new BeneficiaryHistory
@@ -224,8 +229,9 @@ namespace giftcard_api.Controllers
                         };
                         _context.BeneficiaryHistories.Add(beneficiaryHistory);
                         await _context.SaveChangesAsync();
+                        emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email,$"payementdto.Montant",$"merchant.Nom merchant.Prenom");
                     }
-                    return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet });
+                    return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet,EmailResponse = emailresponse });
 
                 }
 
