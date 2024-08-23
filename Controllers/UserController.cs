@@ -22,7 +22,7 @@ namespace giftcard_api.Controllers
         private readonly EmailService _emailService;
 
 
-        public UserController(ApplicationDbContext context, JwtService jwtService, IConfiguration configuration,EmailService emailService)
+        public UserController(ApplicationDbContext context, JwtService jwtService, IConfiguration configuration, EmailService emailService)
         {
             _context = context;
             _configuration = configuration;
@@ -152,7 +152,7 @@ namespace giftcard_api.Controllers
                         IdRole = 2,
                         Email = subscriberdto.Email,
                         Password = hashedPassword,
-                        NomComplet= subscriberdto.SubscriberName,
+                        NomComplet = subscriberdto.SubscriberName,
                         Adresse = subscriberdto.Adresse,
                         Telephone = subscriberdto.Telephone,
                         DateInscription = UtilityDate.GetDate(),
@@ -399,30 +399,43 @@ namespace giftcard_api.Controllers
                     }
                     else
                     {
-                        var beneficiaryWallet = new BeneficiaryWallet
+                        var beneficiary = new Beneficiary();
+                        var existingBeneficiary = await _context.Beneficiaries.FirstOrDefaultAsync(x => x.Email == beneficiarydto.Email && x.IdSubscriber == idsubscriber);
+                        if (existingBeneficiary != null)
                         {
-                            Solde = (double)cartecadeau
-                        };
-                        _context.BeneficiaryWallets.Add(beneficiaryWallet);
-                        await _context.SaveChangesAsync();
-                        var beneficiary = new Beneficiary
+                            var existingBeneficiaryWallet = await  _context.BeneficiaryWallets.FindAsync(existingBeneficiary.IdBeneficiaryWallet);
+                            existingBeneficiaryWallet.Solde += (double)cartecadeau;
+                            _context.Entry(existingBeneficiaryWallet).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                            beneficiary = existingBeneficiary;
+                        }
+                        else
                         {
-                            IdSubscriber = idsubscriber,
-                            IdUser = null,
-                            IdBeneficiaryWallet = beneficiaryWallet.Id,
-                            Nom = beneficiarydto.Nom,
-                            Email = beneficiarydto.Email,
-                            Prenom = beneficiarydto.Prenom,
-                            Has_gochap = beneficiarydto.Has_gochap,
-                            TelephoneNumero = beneficiarydto.TelephoneNumero
-                        };
-                        _context.Beneficiaries.Add(beneficiary);
-                        await _context.SaveChangesAsync();
+                            var beneficiaryWallet = new BeneficiaryWallet
+                            {
+                                Solde = (double)cartecadeau
+                            };
+                            _context.BeneficiaryWallets.Add(beneficiaryWallet);
+                            await _context.SaveChangesAsync();
+                            beneficiary = new Beneficiary
+                            {
+                                IdSubscriber = idsubscriber,
+                                IdUser = null,
+                                IdBeneficiaryWallet = beneficiaryWallet.Id,
+                                Nom = beneficiarydto.Nom,
+                                Email = beneficiarydto.Email,
+                                Prenom = beneficiarydto.Prenom,
+                                Has_gochap = beneficiarydto.Has_gochap,
+                                TelephoneNumero = beneficiarydto.TelephoneNumero
+                            };
+                            _context.Beneficiaries.Add(beneficiary);
+                            await _context.SaveChangesAsync();
+                        }
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
                         var email = beneficiarydto.Email;
                         var cartemontant = $"{cartecadeau}";
-                        var emailresponse = await _emailService.SendEmailAsync(email,token,cartemontant);
-                        return Ok(new { beneficiary, Montant = cartecadeau ,Emailresponse=emailresponse});
+                        var emailresponse = await _emailService.SendEmailAsync(email, token, cartemontant);
+                        return Ok(new { beneficiary, Montant = cartecadeau, Emailresponse = emailresponse });
                     }
 
                 }
@@ -451,7 +464,7 @@ namespace giftcard_api.Controllers
                 {
                     return Unauthorized(new { message = "Email ou mot de passe incorrect." });
                 }
-                if(existingUser.IsActive==false)
+                if (existingUser.IsActive == false)
                 {
                     return Unauthorized("L'utilisateur est désactivé.");
                 }
@@ -460,7 +473,7 @@ namespace giftcard_api.Controllers
                 var refreshToken = _jwtService.GenerateRefreshToken();
                 _jwtService.SaveRefreshToken(existingUser, refreshToken);
 
-                return Ok(new { Token = token});
+                return Ok(new { Token = token });
             }
 
             return Unauthorized("Email ou mot de passe incorrect.");
@@ -485,21 +498,21 @@ namespace giftcard_api.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest refreshRequest)
         {
             var token = refreshRequest.Token;
-                    if (!_jwtService.ValidateTokenWithoutExpiration(token))
-                    {
-                        return BadRequest("Le token est invalide");
-                    }
-                    var claims = _jwtService.ParseJwtToken(token);
-                    int IdUser;
-                    var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
-                    if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
-                    {
-                        IdUser = id;
-                    }
-                    else
-                    {
-                        return NotFound("Utilisateur Non trouvé");
-                    }
+            if (!_jwtService.ValidateTokenWithoutExpiration(token))
+            {
+                return BadRequest("Le token est invalide");
+            }
+            var claims = _jwtService.ParseJwtToken(token);
+            int IdUser;
+            var IdUserClaim = claims.FirstOrDefault(c => c.Key == "nameid");
+            if (!string.IsNullOrEmpty(IdUserClaim.Value) && int.TryParse(IdUserClaim.Value, out int id))
+            {
+                IdUser = id;
+            }
+            else
+            {
+                return NotFound("Utilisateur Non trouvé");
+            }
             var user = await _context.Users.FindAsync(IdUser);
             if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
@@ -526,7 +539,7 @@ namespace giftcard_api.Controllers
         [HttpGet("GetFormatedUsers")]
         public async Task<ActionResult<IEnumerable<FullUser>>> GetFormatedUsers()
         {
-            var users= await _context.Users.Include(u=>u.Role).ToListAsync();
+            var users = await _context.Users.Include(u => u.Role).ToListAsync();
             List<FullUser> fullusers = new List<FullUser>();
             foreach (var user in users)
             {
@@ -537,8 +550,8 @@ namespace giftcard_api.Controllers
                     Telephone = user.Telephone,
                     NomComplet = user.NomComplet,
                     Adresse = user.Adresse,
-                    DateInscription=user.DateInscription,
-                    IsActive=user.IsActive,
+                    DateInscription = user.DateInscription,
+                    IsActive = user.IsActive,
                     NomRole = user.Role.RoleNom
                 });
 
@@ -618,7 +631,7 @@ namespace giftcard_api.Controllers
             }
             var existinguser = await _context.Users.FindAsync(id);
             var hashedPassword = user.Password != null ? BCrypt.Net.BCrypt.HashPassword(user.Password) : existinguser.Password;
-            existinguser.Email = user.Email?? existinguser.Email;
+            existinguser.Email = user.Email ?? existinguser.Email;
             existinguser.Password = hashedPassword;
             existinguser.NomComplet = user.NomComplet ?? existinguser.NomComplet;
             existinguser.Adresse = user.Adresse ?? existinguser.Adresse;
