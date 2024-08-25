@@ -403,11 +403,20 @@ namespace giftcard_api.Controllers
                         var existingBeneficiary = await _context.Beneficiaries.FirstOrDefaultAsync(x => x.Email == beneficiarydto.Email && x.IdSubscriber == idsubscriber);
                         if (existingBeneficiary != null)
                         {
-                            var existingBeneficiaryWallet = await  _context.BeneficiaryWallets.FindAsync(existingBeneficiary.IdBeneficiaryWallet);
+                            var existingBeneficiaryWallet = await _context.BeneficiaryWallets.FindAsync(existingBeneficiary.IdBeneficiaryWallet);
                             existingBeneficiaryWallet.Solde += (double)cartecadeau;
                             _context.Entry(existingBeneficiaryWallet).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
                             beneficiary = existingBeneficiary;
+                            var beneficiaryHistory3 = new BeneficiaryHistory
+                            {
+                                IdBeneficiary = beneficiary.Id,
+                                Montant = cartecadeau ?? 0.0,
+                                Date = UtilityDate.GetDate(),
+                                Action = BeneficiaryHistory.BeneficiaryActions.Recharge,
+                            };
+                            _context.BeneficiaryHistories.Add(beneficiaryHistory3);
+                            await _context.SaveChangesAsync();
                         }
                         else
                         {
@@ -431,6 +440,25 @@ namespace giftcard_api.Controllers
                             _context.Beneficiaries.Add(beneficiary);
                             await _context.SaveChangesAsync();
                         }
+                        var beneficiaryHistory4 = new BeneficiaryHistory
+                        {
+                            IdBeneficiary = beneficiary.Id,
+                            Montant = 0.0,
+                            Date = UtilityDate.GetDate(),
+                            Action = BeneficiaryHistory.BeneficiaryActions.Initial,
+                        };
+                        _context.BeneficiaryHistories.Add(beneficiaryHistory4);
+                        await _context.SaveChangesAsync();
+
+                        var beneficiaryHistory5 = new BeneficiaryHistory
+                        {
+                            IdBeneficiary = beneficiary.Id,
+                            Montant = cartecadeau ?? 0.0,
+                            Date = UtilityDate.GetDate(),
+                            Action = BeneficiaryHistory.BeneficiaryActions.Recharge,
+                        };
+                        _context.BeneficiaryHistories.Add(beneficiaryHistory5);
+                        await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
                         var email = beneficiarydto.Email;
                         var cartemontant = $"{cartecadeau}";

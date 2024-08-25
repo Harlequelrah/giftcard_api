@@ -18,9 +18,9 @@ namespace giftcard_api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtService _jwtService;
-         private readonly EmailService _emailService;
+        private readonly EmailService _emailService;
 
-        public MerchantController(ApplicationDbContext context, JwtService jwtService,EmailService emailService)
+        public MerchantController(ApplicationDbContext context, JwtService jwtService, EmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
@@ -216,27 +216,21 @@ namespace giftcard_api.Controllers
                         Action = MerchantHistory.MerchantActions.Encaissement,
                     };
                     _context.MerchantHistories.Add(merchantHistory);
-
                     await _context.SaveChangesAsync();
-
-                    if (beneficiary.Has_gochap)
+                    var beneficiaryHistory = new BeneficiaryHistory
                     {
-                        var beneficiaryHistory = new BeneficiaryHistory
-                        {
-                            IdBeneficiary = beneficiary.Id,
-                            Montant = payementdto.Montant,
-                            Date = UtilityDate.GetDate(),
-                            Action = BeneficiaryHistory.BeneficiaryActions.Depense,
-                        };
-                        _context.BeneficiaryHistories.Add(beneficiaryHistory);
-                        await _context.SaveChangesAsync();
-
-                    }
-                    var montantAchat =$"{payementdto.Montant}";
-                    var nomMarchand=$"{merchant.Nom} {merchant.Prenom}";
-                    var soldeRestant =$"{beneficiaryWallet.Solde}";
-                    emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email,montantAchat,nomMarchand,soldeRestant);
-                    return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet,EmailResponse = emailresponse });
+                        IdBeneficiary = beneficiary.Id,
+                        Montant = payementdto.Montant,
+                        Date = UtilityDate.GetDate(),
+                        Action = BeneficiaryHistory.BeneficiaryActions.Depense,
+                    };
+                    _context.BeneficiaryHistories.Add(beneficiaryHistory);
+                    await _context.SaveChangesAsync();
+                    var montantAchat = $"{payementdto.Montant}";
+                    var nomMarchand = $"{merchant.Nom} {merchant.Prenom}";
+                    var soldeRestant = $"{beneficiaryWallet.Solde}";
+                    emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email, montantAchat, nomMarchand, soldeRestant);
+                    return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet, EmailResponse = emailresponse });
 
                 }
 
