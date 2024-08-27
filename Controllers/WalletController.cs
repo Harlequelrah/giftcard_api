@@ -31,8 +31,15 @@ namespace giftcard_api.Controllers
         public async Task<IActionResult> UpdateWallet(int idWallet, string type, [FromBody] WalletUpdateDto walletUpdateDto)
         {
             Wallet wallet;
+            User user  ;
             if (type == "subscriber")
             {
+                var subscriber = await _context.Subscribers.FindAsync(walletUpdateDto.Id);
+                if (subscriber == null)
+                {
+                    return NotFound("Souscripteur Non Trouvé");
+                }
+                 user = await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
                 var subscriberhistory = new SubscriberHistory
                 {
                     Action = SubscriberHistory.SubscriberActions.MaintenanceSolde,
@@ -46,6 +53,11 @@ namespace giftcard_api.Controllers
             }
             else if (type == "beneficiary")
             {
+                                var beneficiary = await _context.Beneficiaries.FindAsync(walletUpdateDto.Id);
+                if (beneficiary == null)
+                {
+                    return NotFound("Beneficiaire Non Trouvé");
+                } user = await _context.Users.FirstOrDefaultAsync(u => u.Id == beneficiary.IdUser);
                 var beneficiaryhistory = new BeneficiaryHistory
                 {
                     Action = BeneficiaryHistory.BeneficiaryActions.MaintenanceSolde,
@@ -59,6 +71,12 @@ namespace giftcard_api.Controllers
             }
             else if (type == "merchant")
             {
+                var  merchant = await _context.Subscribers.FindAsync(walletUpdateDto.Id);
+                if (merchant == null)
+                {
+                    return NotFound("Marchand Non Trouvé");
+                }
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Id == merchant.IdUser);
                 var merchanthistory = new MerchantHistory
                 {
                     Action = MerchantHistory.MerchantActions.MaintenanceSolde,
@@ -86,6 +104,9 @@ namespace giftcard_api.Controllers
 
             try
             {
+                var Id=(user.Id).ToString();
+                var message = "Le solde de votre Carte Cadeau a été mis à jour à  Par Le Support GoChap.";
+                await _hubContext.Clients.User(Id).SendAsync("WalletUpdate", message);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

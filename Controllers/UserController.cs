@@ -64,14 +64,16 @@ namespace giftcard_api.Controllers
                         DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                        // Ajouter d'autres propriétés si nécessaire
                     };
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
 
 
                     string token = await _jwtService.GenerateToken(user);
-                    return Ok(new { Token = token });
+                    Console.WriteLine($"password recu :{userdto.Password}");
+                    Console.WriteLine($"password haché :{user.Password}");
+                    bool emailresponse = await _emailService.SendAdminRegistrationEmailAsync(user.Email, user.NomComplet, userdto.Password);
+                    return Ok(new { Token = token ,EmailResponse=emailresponse });
                 }
                 catch (Exception ex)
                 {
@@ -389,12 +391,6 @@ namespace giftcard_api.Controllers
                             await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("WalletUpdated", message);
 
                         }
-
-
-
-
-
-
                         var rechargehistory = new BeneficiaryHistory
                         {
                             IdBeneficiary = existingUserBeneficiary.Id,
@@ -476,9 +472,8 @@ namespace giftcard_api.Controllers
                         _context.BeneficiaryHistories.Add(beneficiaryHistory5);
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
-                        var email = beneficiarydto.Email;
-                        var cartemontant = $"{cartecadeau}";
-                        var emailresponse = await _emailService.SendEmailAsync(email, token, cartemontant);
+                        var subscriberUser=  await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
+                        var emailresponse = await _emailService.SendSubscriberRegistrationEmailAsync(subscriberUser.Email,subscriber.SubscriberName);
                         return Ok(new { beneficiary, Montant = cartecadeau, Emailresponse = emailresponse });
                     }
 

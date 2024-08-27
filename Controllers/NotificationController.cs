@@ -55,7 +55,6 @@ namespace giftcard_api.Controllers
     }
     else
     {
-        // Continuer avec la connexion si l'identifiant existe
         await base.OnConnectedAsync();
     }
 }

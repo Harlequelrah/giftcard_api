@@ -18,58 +18,58 @@ namespace giftcard_api.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        
+
 
         public EmailService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
         }
-        public async Task<bool> SendPayementEmailAsync(string email,string montant,string marchand,string solderestant)
+        public async Task<bool> SendPayementEmailAsync(string email, string montant, string marchand, string solderestant)
         {
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
             var emailMessage = new EmailMessage
-                        {
-                            From = new EmailAddress
-                            {
-                                Email = "info@gochap.solutions",
-                                Name = "GoChap"
-                            },
-                            To = new List<EmailAddress>
+            {
+                From = new EmailAddress
+                {
+                    Email = "info@gochap.solutions",
+                    Name = "GoChap"
+                },
+                To = new List<EmailAddress>
                             {
                                 new EmailAddress { Email = email }
                             },
-                            Subject = "Vous avez effectué un achat par Carte Cadeau !",
-                            Html = $@"
+                Subject = "Vous avez effectué un achat par Carte Cadeau !",
+                Html = $@"
                             <div style='text-align:justify; margin:10px 0;justify-content:center;'>
                             Vous venez d'effectuer un achat par Carte Cadeau d'un montant de {montant} auprès du marchant {marchand};</br>
                             Votre solde de carte cadeau restant est de {solderestant} XOF.</br>
                             Si vous n'êtes pas l'auteur de cet achat.Veuillez concactez le Support Gochap par email à info@gochap.solutions .
                             </div>
                             ",
-                            Category = "Envoi de Confirmation d'Achat"
-                        };
-                    var jsonContent = JsonSerializer.Serialize(emailMessage);
-                        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                Category = "Envoi de Confirmation d'Achat"
+            };
+            var jsonContent = JsonSerializer.Serialize(emailMessage);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                        // Ajout du token d'authentification
-                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            // Ajout du token d'authentification
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                        // Envoi de la requête POST
-                        var response = await _httpClient.PostAsync(url, content);
+            // Envoi de la requête POST
+            var response = await _httpClient.PostAsync(url, content);
 
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            Console.WriteLine($"Email sent successfully: {responseContent}");
-                            return true;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
-                            return false;
-                        }
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Email sent successfully: {responseContent}");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                return false;
+            }
 
         }
 
@@ -142,20 +142,119 @@ namespace giftcard_api.Services
                 }
             }
         }
+        public async Task<bool> SendSubscriberRegistrationEmailAsync(string email, string nom )
+        {
+            var url = _configuration["SendMailAPI:Url"];
+            var token = _configuration["SendMailAPI:Token"];
+            var emailMessage = new EmailMessage
+            {
+                From = new EmailAddress
+                {
+                    Email = "info@gochap.solutions",
+                    Name = "GoChap"
+                },
+                To = new List<EmailAddress>
+                            {
+                                new EmailAddress { Email = email }
+                            },
+                Subject = "Vôtre Inscription comme Souscripteur au Service de Carte Cadeau de GoChap est un succès !",
+                Html = $@"
+                            <div style='text-align:center; margin:10px 0;'>
+                                Félicitations ! {nom} , Pour votre enregistrement en tant que Souscripteur
+                                dans le Service de Carte Cadeau de GoChap.Cette dernière innovation de GoChap Vous permet d'enregistrer vos
+                                employés comme bénéficiaire afin de leur octroyer une carte cadeau permettant de faire des achats au près de
+                                nos marchands les acceptant comme moyen de payement.
+                                </div>
+                            ",
+                Category = "Confirmation d'inscription"
+            };
+
+
+            var jsonContent = JsonSerializer.Serialize(emailMessage);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Email sent successfully: {responseContent}");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                return false;
+            }
+        }
+                public async Task<bool> SendAdminRegistrationEmailAsync(string email, string nom,string password)
+        {
+            var url = _configuration["SendMailAPI:Url"];
+            var token = _configuration["SendMailAPI:Token"];
+            var emailMessage = new EmailMessage
+            {
+                From = new EmailAddress
+                {
+                    Email = "info@gochap.solutions",
+                    Name = "GoChap"
+                },
+                To = new List<EmailAddress>
+                            {
+                                new EmailAddress { Email = email }
+                            },
+                Subject = "Vôtre Inscription comme Administrateur au Service de Carte Cadeau de GoChap est un succès !",
+                Html = $@"
+                            <div style='text-align:center; margin:10px 0;'>
+                                Félicitations ! {nom} , Pour votre enregistrement en tant que Administrateur
+                                dans le Service de Carte Cadeau de GoChap. Vous pouvez utiliser ce mot de passe
+                                Pour vous connecter sur la plateforme Web <{password}>.
+                                </div>
+                            ",
+                Category = "Confirmation d'inscription"
+            };
+
+
+            var jsonContent = JsonSerializer.Serialize(emailMessage);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Email sent successfully: {responseContent}");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                return false;
+            }
+        }
     }
 
-    public class EmailAddress
-    {
-        public string Email { get; set; }
-        public string Name { get; set; }
-    }
 
-    public class EmailMessage
-    {
-        public EmailAddress From { get; set; }
-        public List<EmailAddress> To { get; set; }
-        public string Subject { get; set; }
-        public string Html { get; set; }
-        public string Category { get; set; }
+
+        public class EmailAddress
+        {
+            public string Email { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class EmailMessage
+        {
+            public EmailAddress From { get; set; }
+            public List<EmailAddress> To { get; set; }
+            public string Subject { get; set; }
+            public string Html { get; set; }
+            public string Category { get; set; }
+        }
     }
-}

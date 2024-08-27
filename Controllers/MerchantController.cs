@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace giftcard_api.Controllers
 {
@@ -18,13 +19,15 @@ namespace giftcard_api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtService _jwtService;
+        private readonly IHubContext<NotificationHub> _hubContext;
         private readonly EmailService _emailService;
 
-        public MerchantController(ApplicationDbContext context, JwtService jwtService, EmailService emailService)
+        public MerchantController(IHubContext<NotificationHub> hubContext,ApplicationDbContext context, JwtService jwtService, EmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
             _emailService = emailService;
+            _hubContext = hubContext;
         }
 
 
@@ -229,6 +232,10 @@ namespace giftcard_api.Controllers
                     var montantAchat = $"{payementdto.Montant}";
                     var nomMarchand = $"{merchant.Nom} {merchant.Prenom}";
                     var soldeRestant = $"{beneficiaryWallet.Solde}";
+                    var MerchantUser = _context.Users.FirstOrDefault(u => u.Id==merchant.IdUser);
+                    var merchantId= (MerchantUser.Id).ToString();
+                    var message = "Le Payement a bien été effectué.";
+                    await _hubContext.Clients.User(merchantId).SendAsync("payementValidation", message);
                     emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email, montantAchat, nomMarchand, soldeRestant);
                     return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet, EmailResponse = emailresponse });
 
@@ -236,7 +243,7 @@ namespace giftcard_api.Controllers
 
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
+
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
