@@ -157,7 +157,7 @@ namespace giftcard_api.Services
                             {
                                 new EmailAddress { Email = email }
                             },
-                Subject = "Vôtre Inscription comme Souscripteur au Service de Carte Cadeau de GoChap est un succès !",
+                Subject = "Votre Inscription est un succès !",
                 Html = $@"
                             <div style='text-align:center; margin:10px 0;'>
                                 Félicitations ! {nom} , Pour votre enregistrement en tant que Souscripteur
@@ -206,7 +206,7 @@ namespace giftcard_api.Services
                             {
                                 new EmailAddress { Email = email }
                             },
-                Subject = "Vôtre Inscription comme Administrateur au Service de Carte Cadeau de GoChap est un succès !",
+                Subject = "Votre Inscription  est un succès !",
                 Html = $@"
                             <div style='text-align:center; margin:10px 0;'>
                                 Félicitations ! {nom} , Pour votre enregistrement en tant que Administrateur
