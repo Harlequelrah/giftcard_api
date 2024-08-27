@@ -18,6 +18,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:5107");
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -44,6 +45,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 ValidAudience = builder.Configuration["Jwt:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
             };
+        options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            if (!string.IsNullOrEmpty(accessToken) &&
+                context.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+
+    };
+
+
+
+
         });
 builder.Services.AddAuthorization(options =>
     {
@@ -70,7 +89,8 @@ app.UseCors(builder =>
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // Mappe les contrôleurs pour répondre aux requêtes.
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 

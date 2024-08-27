@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using QRCoder;
+using Microsoft.AspNetCore.SignalR;
 
 namespace giftcard_api.Services
 {
@@ -17,6 +18,7 @@ namespace giftcard_api.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        
 
         public EmailService(HttpClient httpClient, IConfiguration configuration)
         {

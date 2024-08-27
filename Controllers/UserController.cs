@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 namespace giftcard_api.Controllers
 {
     [Route("api/[controller]")]
@@ -20,14 +21,16 @@ namespace giftcard_api.Controllers
         private readonly JwtService _jwtService;
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
 
-        public UserController(ApplicationDbContext context, JwtService jwtService, IConfiguration configuration, EmailService emailService)
+        public UserController(IHubContext<NotificationHub> hubContext, ApplicationDbContext context, JwtService jwtService, IConfiguration configuration, EmailService emailService)
         {
             _context = context;
             _configuration = configuration;
             _jwtService = jwtService;
             _emailService = emailService;
+            _hubContext = hubContext;
         }
         [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
@@ -38,7 +41,6 @@ namespace giftcard_api.Controllers
             {
                 try
                 {
-                    // Vérifiez si l'utilisateur existe déjà
                     var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userdto.Email);
                     if (existingUser != null)
                     {
@@ -346,47 +348,61 @@ namespace giftcard_api.Controllers
                         {
                             return NotFound("Utilisateur Non trouvé");
                         }
-                        existingUser.IdRole = 1;
-                        _context.Entry(existingUser).State = EntityState.Modified;
-                        await _context.SaveChangesAsync();
-
-
-                        var beneficiaryWallet = new BeneficiaryWallet();
-                        _context.BeneficiaryWallets.Add(beneficiaryWallet);
-                        await _context.SaveChangesAsync();
-
-                        var beneficiary = new Beneficiary
+                        var existingUserBeneficiary = await _context.Beneficiaries.FindAsync(existingUser);
+                        Beneficiary beneficiary;
+                        if (existingUserBeneficiary == null)
                         {
-                            IdSubscriber = idsubscriber,
-                            IdUser = existingUser.Id,
-                            IdBeneficiaryWallet = beneficiaryWallet.Id,
-                            Nom = beneficiarydto.Nom,
-                            Email = beneficiarydto.Email,
-                            Prenom = beneficiarydto.Prenom,
-                            Has_gochap = beneficiarydto.Has_gochap,
-                            TelephoneNumero = beneficiarydto.TelephoneNumero
-                        };
-                        _context.Beneficiaries.Add(beneficiary);
-                        await _context.SaveChangesAsync();
+                            existingUser.IdRole = 1;
+                            _context.Entry(existingUser).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                            var beneficiaryWallet = new BeneficiaryWallet();
+                            _context.BeneficiaryWallets.Add(beneficiaryWallet);
+                            await _context.SaveChangesAsync();
 
-                        var beneficiaryHistory = new BeneficiaryHistory
+                            beneficiary = new Beneficiary
+                            {
+                                IdSubscriber = idsubscriber,
+                                IdUser = existingUser.Id,
+                                IdBeneficiaryWallet = beneficiaryWallet.Id,
+                                Nom = beneficiarydto.Nom,
+                                Email = beneficiarydto.Email,
+                                Prenom = beneficiarydto.Prenom,
+                                Has_gochap = beneficiarydto.Has_gochap,
+                                TelephoneNumero = beneficiarydto.TelephoneNumero
+                            };
+                            _context.Beneficiaries.Add(beneficiary);
+                            await _context.SaveChangesAsync();
+                            var beneficiaryHistory = new BeneficiaryHistory
+                            {
+                                IdBeneficiary = beneficiary.Id,
+                                Montant = 0.0,
+                                Date = UtilityDate.GetDate(),
+                                Action = BeneficiaryHistory.BeneficiaryActions.Initial,
+                            };
+                            _context.BeneficiaryHistories.Add(beneficiaryHistory);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
                         {
-                            IdBeneficiary = beneficiary.Id,
-                            Montant = 0.0,
-                            Date = UtilityDate.GetDate(),
-                            Action = BeneficiaryHistory.BeneficiaryActions.Initial,
-                        };
-                        _context.BeneficiaryHistories.Add(beneficiaryHistory);
-                        await _context.SaveChangesAsync();
+                            beneficiary = existingUserBeneficiary;
+                            var message = "Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
+                            await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("WalletUpdated", message);
 
-                        var beneficiaryHistory2 = new BeneficiaryHistory
+                        }
+
+
+
+
+
+
+                        var rechargehistory = new BeneficiaryHistory
                         {
-                            IdBeneficiary = beneficiary.Id,
+                            IdBeneficiary = existingUserBeneficiary.Id,
                             Montant = cartecadeau ?? 0.0,
                             Date = UtilityDate.GetDate(),
                             Action = BeneficiaryHistory.BeneficiaryActions.Recharge,
                         };
-                        _context.BeneficiaryHistories.Add(beneficiaryHistory2);
+                        _context.BeneficiaryHistories.Add(rechargehistory);
                         await _context.SaveChangesAsync();
                         var rechargebeneficiarywallet = beneficiary.BeneficiaryWallet;
                         rechargebeneficiarywallet.Solde = rechargebeneficiarywallet.Solde + (double)cartecadeau;

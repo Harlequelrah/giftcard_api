@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace giftcard_api.Controllers
 {
@@ -17,10 +18,13 @@ namespace giftcard_api.Controllers
     public class WalletController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+         private readonly IHubContext<NotificationHub> _hubContext;
 
-        public WalletController(ApplicationDbContext context)
+
+        public WalletController(IHubContext<NotificationHub> hubContext,ApplicationDbContext context)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         [HttpPut("{type}/{idWallet}")]
