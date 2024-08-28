@@ -70,6 +70,7 @@ namespace giftcard_api.Controllers
 
 
                     string token = await _jwtService.GenerateToken(user);
+                    Console.WriteLine($"userdto.Password:{userdto.Password}");
                     bool emailresponse = await _emailService.SendAdminRegistrationEmailAsync(user.Email, user.NomComplet, userdto.Password);
                     return Ok(new { Token = token ,EmailResponse=emailresponse });
                 }

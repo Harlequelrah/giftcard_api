@@ -142,7 +142,7 @@ namespace giftcard_api.Services
                 }
             }
         }
-        public async Task<bool> SendSubscriberRegistrationEmailAsync(string email, string nom )
+        public async Task<bool> SendSubscriberRegistrationEmailAsync(string email, string nom)
         {
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
@@ -191,8 +191,9 @@ namespace giftcard_api.Services
                 return false;
             }
         }
-                public async Task<bool> SendAdminRegistrationEmailAsync(string email, string nom,string password)
+        public async Task<bool> SendAdminRegistrationEmailAsync(string email, string nom, string password)
         {
+            Console.WriteLine($"password: {password}");
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
             var emailMessage = new EmailMessage
@@ -211,7 +212,7 @@ namespace giftcard_api.Services
                             <div style='text-align:center; margin:10px 0;'>
                                 Félicitations ! {nom} , Pour votre enregistrement en tant que Administrateur
                                 dans le Service de Carte Cadeau de GoChap. Vous pouvez utiliser ce mot de passe
-                                Pour vous connecter sur la plateforme Web <{password}>.
+                                Pour vous connecter sur la plateforme Web  <span style='border:1px solid;padding:4px 4px;border-radius:4px;'>{password}</span> .
                                 </div>
                             ",
                 Category = "Confirmation d'inscription"
@@ -243,18 +244,18 @@ namespace giftcard_api.Services
 
 
 
-        public class EmailAddress
-        {
-            public string Email { get; set; }
-            public string Name { get; set; }
-        }
-
-        public class EmailMessage
-        {
-            public EmailAddress From { get; set; }
-            public List<EmailAddress> To { get; set; }
-            public string Subject { get; set; }
-            public string Html { get; set; }
-            public string Category { get; set; }
-        }
+    public class EmailAddress
+    {
+        public string Email { get; set; }
+        public string Name { get; set; }
     }
+
+    public class EmailMessage
+    {
+        public EmailAddress From { get; set; }
+        public List<EmailAddress> To { get; set; }
+        public string Subject { get; set; }
+        public string Html { get; set; }
+        public string Category { get; set; }
+    }
+}
