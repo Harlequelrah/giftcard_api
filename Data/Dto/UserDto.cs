@@ -60,4 +60,14 @@ namespace giftcard_api.Models
         public string Email { get; set; }
         public string Solde { get; set; }
     }
+    public class ResetPasswordRequest
+    {
+    [EmailAddress]
+    [Required]
+    public string Email { get; set; }
+    [Required]
+    public string CurrentPassword { get; set; }
+    [Required]
+    public string NewPassword { get; set; }
+    }
 }

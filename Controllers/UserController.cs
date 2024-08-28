@@ -32,6 +32,39 @@ namespace giftcard_api.Controllers
             _emailService = emailService;
             _hubContext = hubContext;
         }
+
+
+        [Authorize(Policy = "IsActive")]
+        [Authorize]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult>  ResetPasswordAsync(ResetPasswordRequest resetUser)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == resetUser.Email);
+                    if (existingUser == null) return NotFound("Utilisateur Non Trouvé");
+                    else
+                    {
+                        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(resetUser.CurrentPassword, existingUser.Password);
+                        if (!isPasswordValid) return Unauthorized(new { message = "Email ou mot de passe incorrect." });
+                        existingUser.Password = BCrypt.Net.BCrypt.HashPassword(resetUser.NewPassword);
+                        _context.Entry(existingUser).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                        return Ok();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
+                }
+            }
+            return BadRequest(ModelState);
+
+        }
+
+
         [Authorize(Policy = "IsActive")]
         [Authorize(Roles = "ADMIN")]
         [HttpPost("register/admin")]
@@ -72,7 +105,7 @@ namespace giftcard_api.Controllers
                     string token = await _jwtService.GenerateToken(user);
                     Console.WriteLine($"userdto.Password:{userdto.Password}");
                     bool emailresponse = await _emailService.SendAdminRegistrationEmailAsync(user.Email, user.NomComplet, userdto.Password);
-                    return Ok(new { Token = token ,EmailResponse=emailresponse });
+                    return Ok(new { Token = token, EmailResponse = emailresponse });
                 }
                 catch (Exception ex)
                 {
@@ -471,8 +504,8 @@ namespace giftcard_api.Controllers
                         _context.BeneficiaryHistories.Add(beneficiaryHistory5);
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
-                        var subscriberUser=  await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
-                        var emailresponse = await _emailService.SendSubscriberRegistrationEmailAsync(subscriberUser.Email,subscriber.SubscriberName);
+                        var subscriberUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
+                        var emailresponse = await _emailService.SendSubscriberRegistrationEmailAsync(subscriberUser.Email, subscriber.SubscriberName);
                         return Ok(new { beneficiary, Montant = cartecadeau, Emailresponse = emailresponse });
                     }
 
