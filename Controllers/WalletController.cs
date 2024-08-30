@@ -106,7 +106,7 @@ namespace giftcard_api.Controllers
             {
                 var Id=(user.Id).ToString();
                 var message = "Le solde de votre Carte Cadeau a été mis à jour à  Par Le Support GoChap.";
-                await _hubContext.Clients.User(Id).SendAsync("WalletUpdate", message);
+                await _hubContext.Clients.User(Id).SendAsync("ReceiveMessage", message);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

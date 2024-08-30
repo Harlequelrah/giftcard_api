@@ -420,7 +420,7 @@ namespace giftcard_api.Controllers
                         {
                             beneficiary = existingUserBeneficiary;
                             var message = "Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
-                            await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("WalletUpdated", message);
+                            await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
 
                         }
                         var rechargehistory = new BeneficiaryHistory
