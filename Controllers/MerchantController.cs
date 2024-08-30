@@ -163,6 +163,7 @@ namespace giftcard_api.Controllers
                     }
                     else
                     {
+                    IdUser = 0;
                         var IdBeneficiaryClaim = claims.FirstOrDefault(c => c.Key == "beneficiaryid");
                         if (!string.IsNullOrEmpty(IdBeneficiaryClaim.Value) && int.TryParse(IdBeneficiaryClaim.Value, out int idbef))
                         {
@@ -235,7 +236,12 @@ namespace giftcard_api.Controllers
                     var MerchantUser = _context.Users.FirstOrDefault(u => u.Id==merchant.IdUser);
                     var merchantId= (MerchantUser.Id).ToString();
                     var message = "Le Payement a bien été effectué.";
-                    await _hubContext.Clients.User(merchantId).SendAsync("payementValidation", message);
+                    Console.WriteLine($"merchand Id :{merchantId}");
+                    if(IdUser!=0)
+                    {
+                    await _hubContext.Clients.User(IdUser.ToString()).SendAsync("ReceiveMessage","Votre achat a bien été effectué");
+                    }
+                    await _hubContext.Clients.User(merchantId).SendAsync("ReceiveMessage", message);
                     emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email, montantAchat, nomMarchand, soldeRestant);
                     return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet, EmailResponse = emailresponse });
 

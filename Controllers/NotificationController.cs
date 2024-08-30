@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace giftcard_api.Controllers
 {
-    [Authorize(Roles="ADMIN")]
-    [Authorize(Policy = "IsActive")]
+    // [Authorize(Roles="ADMIN")]
+    // [Authorize(Policy = "IsActive")]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
