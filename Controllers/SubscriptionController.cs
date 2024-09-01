@@ -83,6 +83,35 @@ namespace giftcard_api.Controllers
             }
             return subscription;
         }
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("FormatedSubscriptions")]
+        public async Task<ActionResult<IEnumerable<FullSubscriptionDto>>> GetFormatedSubscriptions()
+        {
+            var Subscriptions = await _context.Subscriptions
+                .Include(s => s.Package)
+                .Include(s => s.Subscriber)
+                .ToListAsync();
+            List<FullSubscriptionDto> SendingSubscriptions = new List<FullSubscriptionDto>();
+            foreach (var subscription in Subscriptions)
+            {
+                var montant = subscription.MontantParCarte.HasValue ? subscription.MontantParCarte : subscription.Package.MontantBase;
+                var formatdate = subscription.DateExpiration.HasValue ? UtilityDate.FormatDate((DateTime)subscription.DateExpiration) : null;
+                var sendingsubscription = new FullSubscriptionDto
+                {
+                    Id = subscription.Id,
+                    NomPackage = subscription.Package.NomPackage,
+                    NomSubscriber = subscription.Subscriber.SubscriberName,
+                    NbrCarteGenere = subscription.NbrCarteGenere,
+                    BudgetRestant = subscription.BudgetRestant,
+                    DateSouscription = subscription.DateSouscription,
+                    DateExpiration = formatdate,
+                    MontantParCarte = montant,
+                };
+                SendingSubscriptions.Add(sendingsubscription);
+
+            }
+            return SendingSubscriptions;
+        }
 
 
         [Authorize(Roles = "ADMIN")]
@@ -90,7 +119,7 @@ namespace giftcard_api.Controllers
         public async Task<ActionResult<IEnumerable<FullSubscriptionDto>>> GetSubscriptionsByPackage(int packageId)
         {
             var package = await _context.Packages.FindAsync(packageId);
-            if(package==null)
+            if (package == null)
             {
                 return NotFound("Package not found");
             }

@@ -37,7 +37,7 @@ namespace giftcard_api.Controllers
         [Authorize(Policy = "IsActive")]
         [Authorize]
         [HttpPost("reset-password")]
-        public async Task<IActionResult>  ResetPasswordAsync(ResetPasswordRequest resetUser)
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequest resetUser)
         {
             if (ModelState.IsValid)
             {
@@ -377,15 +377,18 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
                     if (beneficiarydto.Has_gochap)
                     {
+                        Console.WriteLine("Le beneficiaire a gochap");
                         var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
                         if (existingUser == null)
                         {
                             return NotFound("Utilisateur Non trouvé");
                         }
-                        var existingUserBeneficiary = await _context.Beneficiaries.FindAsync(existingUser);
+
+                        var existingUserBeneficiary = await _context.Beneficiaries.FindAsync(existingUser.Id);
                         Beneficiary beneficiary;
                         if (existingUserBeneficiary == null)
                         {
+
                             existingUser.IdRole = 1;
                             _context.Entry(existingUser).State = EntityState.Modified;
                             await _context.SaveChangesAsync();
@@ -418,10 +421,10 @@ namespace giftcard_api.Controllers
                         }
                         else
                         {
+                            
                             beneficiary = existingUserBeneficiary;
                             var message = "Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
                             await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
-
                         }
                         var rechargehistory = new BeneficiaryHistory
                         {

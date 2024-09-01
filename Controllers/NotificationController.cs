@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace giftcard_api.Controllers
 {
-    // [Authorize(Roles="ADMIN")]
-    // [Authorize(Policy = "IsActive")]
+    [Authorize(Roles="ADMIN")]
+    [Authorize(Policy = "IsActive")]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -29,7 +29,6 @@ namespace giftcard_api.Controllers
         [HttpPost("send-notification")]
         public async Task<IActionResult> SendNotification(string userId, string message)
         {
-            // Vérifier si l'utilisateur existe dans la base de données
             var userExists = await _dbContext.Users.AnyAsync(u => u.Id == int.Parse(userId));
 
             if (!userExists)
@@ -37,7 +36,6 @@ namespace giftcard_api.Controllers
                 return NotFound(new { message = "Utilisateur non trouvé." });
             }
 
-            // Envoyer la notification si l'utilisateur existe
             await _hubContext.Clients.User(userId).SendAsync("ReceiveMessage", message);
             return Ok(new { message = "Notification envoyée avec succès." });
         }
