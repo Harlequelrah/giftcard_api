@@ -19,19 +19,23 @@ namespace giftcard_api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtService _jwtService;
+        private readonly RegisterBeneficiaryService _registerBeneficiaryService;
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
         private readonly IHubContext<NotificationHub> _hubContext;
 
 
-        public UserController(IHubContext<NotificationHub> hubContext, ApplicationDbContext context, JwtService jwtService, IConfiguration configuration, EmailService emailService)
+        public UserController(IHubContext<NotificationHub> hubContext, ApplicationDbContext context, JwtService jwtService, IConfiguration configuration, EmailService emailService, RegisterBeneficiaryService registerBeneficairyService)
         {
             _context = context;
             _configuration = configuration;
             _jwtService = jwtService;
             _emailService = emailService;
             _hubContext = hubContext;
+            _registerBeneficiaryService = registerBeneficairyService;
         }
+
+
 
 
         [Authorize(Policy = "IsActive")]
@@ -63,6 +67,7 @@ namespace giftcard_api.Controllers
             return BadRequest(ModelState);
 
         }
+
 
 
         [Authorize(Policy = "IsActive")]
@@ -384,64 +389,37 @@ namespace giftcard_api.Controllers
                             return NotFound("Utilisateur Non trouvé");
                         }
 
-                        var existingUserBeneficiary = await _context.Beneficiaries.FindAsync(existingUser.Id);
-                        Beneficiary beneficiary;
+                        var existingUserBeneficiary = await _context.Beneficiaries
+                                            .Include(b => b.BeneficiaryWallet)
+                                            .FirstOrDefaultAsync(b => b.IdUser == existingUser.Id);
                         if (existingUserBeneficiary == null)
                         {
-
-                            existingUser.IdRole = 1;
-                            _context.Entry(existingUser).State = EntityState.Modified;
-                            await _context.SaveChangesAsync();
-                            var beneficiaryWallet = new BeneficiaryWallet();
-                            _context.BeneficiaryWallets.Add(beneficiaryWallet);
-                            await _context.SaveChangesAsync();
-
-                            beneficiary = new Beneficiary
+                            Console.WriteLine("Il a jamais été beneficiaire");
+                            var newbeneficiary = await _registerBeneficiaryService.RegisterGoChapNewBeneficiary(beneficiarydto, existingUser, idsubscriber);
+                            if (newbeneficiary == null)
                             {
-                                IdSubscriber = idsubscriber,
-                                IdUser = existingUser.Id,
-                                IdBeneficiaryWallet = beneficiaryWallet.Id,
-                                Nom = beneficiarydto.Nom,
-                                Email = beneficiarydto.Email,
-                                Prenom = beneficiarydto.Prenom,
-                                Has_gochap = beneficiarydto.Has_gochap,
-                                TelephoneNumero = beneficiarydto.TelephoneNumero
-                            };
-                            _context.Beneficiaries.Add(beneficiary);
-                            await _context.SaveChangesAsync();
-                            var beneficiaryHistory = new BeneficiaryHistory
+                                Console.WriteLine("Enregistrement non effective");
+                            }
+
+                            else
                             {
-                                IdBeneficiary = beneficiary.Id,
-                                Montant = 0.0,
-                                Date = UtilityDate.GetDate(),
-                                Action = BeneficiaryHistory.BeneficiaryActions.Initial,
-                            };
-                            _context.BeneficiaryHistories.Add(beneficiaryHistory);
-                            await _context.SaveChangesAsync();
+                                Console.WriteLine("Enregistrement non effective");
+                                var beneficiary = await _registerBeneficiaryService.RegisterGoChapOldBeneficiary(newbeneficiary, cartecadeau);
+                                if (newbeneficiary == null) Console.WriteLine("Mise a jour non effective");
+                                else Console.WriteLine("Mise a jour  effective");
+                            }
                         }
                         else
                         {
-                            
-                            beneficiary = existingUserBeneficiary;
-                            var message = "Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
-                            await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
+                            Console.WriteLine("Il a deja été beneficiaire");
+                            var beneficiary = await _registerBeneficiaryService.RegisterGoChapOldBeneficiary(existingUserBeneficiary, cartecadeau);
                         }
-                        var rechargehistory = new BeneficiaryHistory
-                        {
-                            IdBeneficiary = existingUserBeneficiary.Id,
-                            Montant = cartecadeau ?? 0.0,
-                            Date = UtilityDate.GetDate(),
-                            Action = BeneficiaryHistory.BeneficiaryActions.Recharge,
-                        };
-                        _context.BeneficiaryHistories.Add(rechargehistory);
-                        await _context.SaveChangesAsync();
-                        var rechargebeneficiarywallet = beneficiary.BeneficiaryWallet;
-                        rechargebeneficiarywallet.Solde = rechargebeneficiarywallet.Solde + (double)cartecadeau;
-                        _context.Entry(rechargebeneficiarywallet).State = EntityState.Modified;
-                        await _context.SaveChangesAsync();
+                        var message = $"Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
+                        await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
+
                         var token = await _jwtService.GenerateToken(existingUser);
 
-                        return Ok(new { Token = token, beneficiary });
+                        return Ok(new { Token = token });
 
                     }
                     else
@@ -515,7 +493,6 @@ namespace giftcard_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
@@ -753,4 +730,5 @@ namespace giftcard_api.Controllers
 
 
     }
+
 }

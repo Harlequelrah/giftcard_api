@@ -27,6 +27,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<RegisterBeneficiaryService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
