@@ -382,6 +382,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
                     if (beneficiarydto.Has_gochap)
                     {
+                        var Message = "";
                         Console.WriteLine("Le beneficiaire a gochap");
                         var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
                         if (existingUser == null)
@@ -394,6 +395,7 @@ namespace giftcard_api.Controllers
                                             .FirstOrDefaultAsync(b => b.IdUser == existingUser.Id);
                         if (existingUserBeneficiary == null)
                         {
+
                             Console.WriteLine("Il a jamais été beneficiaire");
                             var newbeneficiary = await _registerBeneficiaryService.RegisterGoChapNewBeneficiary(beneficiarydto, existingUser, idsubscriber);
                             if (newbeneficiary == null)
@@ -403,6 +405,7 @@ namespace giftcard_api.Controllers
 
                             else
                             {
+
                                 Console.WriteLine("Enregistrement non effective");
                                 var beneficiary = await _registerBeneficiaryService.RegisterGoChapOldBeneficiary(newbeneficiary, cartecadeau);
                                 if (newbeneficiary == null) Console.WriteLine("Mise a jour non effective");
@@ -411,15 +414,17 @@ namespace giftcard_api.Controllers
                         }
                         else
                         {
+                            Message = "Le bénéficiaire a déjà un souscripteur ainsi n'apparaitra pas dans votre liste de bénéficiare mais aura son  solde a  mise à jour";
                             Console.WriteLine("Il a deja été beneficiaire");
                             var beneficiary = await _registerBeneficiaryService.RegisterGoChapOldBeneficiary(existingUserBeneficiary, cartecadeau);
+                            await _emailService.SendRechargeEmailAsync(beneficiary.Email,$"{beneficiary.Nom} {beneficiary.Prenom}",subscriber.SubscriberName,$"{cartecadeau}");
                         }
                         var message = $"Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
                         await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
 
                         var token = await _jwtService.GenerateToken(existingUser);
 
-                        return Ok(new { Token = token });
+                        return Ok(new { Token = token, Message = Message });
 
                     }
                     else

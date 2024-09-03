@@ -240,7 +240,58 @@ namespace giftcard_api.Services
                 return false;
             }
         }
+                public async Task<bool> SendRechargeEmailAsync(string email, string beneficiary,string souscripteur, string montant)
+        {
+
+            var url = _configuration["SendMailAPI:Url"];
+            var token = _configuration["SendMailAPI:Token"];
+            var emailMessage = new EmailMessage
+            {
+                From = new EmailAddress
+                {
+                    Email = "info@gochap.solutions",
+                    Name = "GoChap"
+                },
+                To = new List<EmailAddress>
+                            {
+                                new EmailAddress { Email = email }
+                            },
+                Subject = "Votre Carde cadeau a été rechargée !",
+                Html = $@"
+                            <div style='text-align:center; margin:10px 0;'>
+                                Félicitations ! {beneficiary} ,
+                                Votre carte cadeau a été rechargée par {souscripteur} pour une valeur de {montant} XOF. Vous pouvez utiliser cette carte pour des achats auprès de nos marchands qui acceptent le paiement par carte cadeau.
+                                </div>
+                            ",
+                Category = "Recharge de Carte Cadeau"
+            };
+
+
+            var jsonContent = JsonSerializer.Serialize(emailMessage);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Email sent successfully: {responseContent}");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                return false;
+            }
+        }
+    
     }
+
+
 
 
 
