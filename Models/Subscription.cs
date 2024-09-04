@@ -17,7 +17,7 @@ namespace giftcard_api.Models
         private int? _nbrCarteGenere=0;
         private DateTime? _dateExpiration;
 
-        // Propriétés publiques
+
 
         [Key]
         public int Id

@@ -114,7 +114,7 @@ namespace giftcard_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
+
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
@@ -128,7 +128,7 @@ namespace giftcard_api.Controllers
             {
                 try
                 {
-                    // Vérifiez si l'utilisateur existe déjà
+
                     var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userdto.Email);
                     if (existingUser != null)
                     {
@@ -151,7 +151,7 @@ namespace giftcard_api.Controllers
                         DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                        // Ajouter d'autres propriétés si nécessaire
+
                     };
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
@@ -162,7 +162,7 @@ namespace giftcard_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
+
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
@@ -175,7 +175,7 @@ namespace giftcard_api.Controllers
             {
                 try
                 {
-                    // Vérifiez si l'utilisateur existe déjà
+
                     var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == subscriberdto.Email);
                     if (existingUser != null)
                     {
@@ -199,7 +199,7 @@ namespace giftcard_api.Controllers
                         DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                        // Ajouter d'autres propriétés si nécessaire
+
                     };
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
@@ -229,7 +229,7 @@ namespace giftcard_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
+
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
@@ -242,7 +242,7 @@ namespace giftcard_api.Controllers
             {
                 try
                 {
-                    // Vérifiez si l'utilisateur existe déjà
+
                     var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == merchantdto.Email);
                     if (existingUser != null)
                     {
@@ -267,7 +267,7 @@ namespace giftcard_api.Controllers
                         DateInscription = UtilityDate.GetDate(),
                         RefreshToken = _jwtService.GenerateRefreshToken(),
                         RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7)
-                        // Ajouter d'autres propriétés si nécessaire
+
                     };
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
@@ -298,7 +298,7 @@ namespace giftcard_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log l'exception et retournez une réponse d'erreur appropriée
+
                     return StatusCode(500, new { message = "Une erreur est survenue.", details = ex.Message });
                 }
             }
@@ -380,9 +380,11 @@ namespace giftcard_api.Controllers
                     };
                     _context.SubscriberHistories.Add(subscriberHistory);
                     await _context.SaveChangesAsync();
+
                     if (beneficiarydto.Has_gochap)
                     {
                         var Message = "";
+                        bool? rechargemailresponse = null;
                         Console.WriteLine("Le beneficiaire a gochap");
                         var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == beneficiarydto.Email);
                         if (existingUser == null)
@@ -393,6 +395,7 @@ namespace giftcard_api.Controllers
                         var existingUserBeneficiary = await _context.Beneficiaries
                                             .Include(b => b.BeneficiaryWallet)
                                             .FirstOrDefaultAsync(b => b.IdUser == existingUser.Id);
+
                         if (existingUserBeneficiary == null)
                         {
 
@@ -417,14 +420,18 @@ namespace giftcard_api.Controllers
                             Message = "Le bénéficiaire a déjà un souscripteur ainsi n'apparaitra pas dans votre liste de bénéficiare mais aura son  solde a  mise à jour";
                             Console.WriteLine("Il a deja été beneficiaire");
                             var beneficiary = await _registerBeneficiaryService.RegisterGoChapOldBeneficiary(existingUserBeneficiary, cartecadeau);
-                            await _emailService.SendRechargeEmailAsync(beneficiary.Email,$"{beneficiary.Nom} {beneficiary.Prenom}",subscriber.SubscriberName,$"{cartecadeau}");
+
+
+                            rechargemailresponse = await _emailService.SendRechargeEmailAsync(beneficiary.Email,$"{beneficiary.Nom} {beneficiary.Prenom}",subscriber.SubscriberName,$"{cartecadeau}");
+
+
                         }
                         var message = $"Votre Carte Cadeau a eté rechargée d'un montant de {cartecadeau} Par Le Souscripteur {subscriber.SubscriberName}";
                         await _hubContext.Clients.User(existingUser.Id.ToString()).SendAsync("ReceiveMessage", message);
 
-                        var token = await _jwtService.GenerateToken(existingUser);
 
-                        return Ok(new { Token = token, Message = Message });
+
+                        return Ok(new {Message = Message,Emailresponse=rechargemailresponse});
 
                     }
                     else
@@ -491,8 +498,14 @@ namespace giftcard_api.Controllers
                         await _context.SaveChangesAsync();
                         var token = await _jwtService.GenerateBeneficiaryToken(beneficiary);
                         var subscriberUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
+
+
                         var emailresponse = await _emailService.SendSubscriberRegistrationEmailAsync(subscriberUser.Email, subscriber.SubscriberName);
-                        return Ok(new { beneficiary, Montant = cartecadeau, Emailresponse = emailresponse });
+
+
+
+
+                        return Ok(new {Emailresponse = emailresponse });
                     }
 
                 }
@@ -524,7 +537,7 @@ namespace giftcard_api.Controllers
                 {
                     return Unauthorized("L'utilisateur est désactivé.");
                 }
-                // Générez un jeton JWT pour l'utilisateur authentifié
+
                 var token = await _jwtService.GenerateToken(existingUser);
                 var refreshToken = _jwtService.GenerateRefreshToken();
                 _jwtService.SaveRefreshToken(existingUser, refreshToken);
@@ -574,7 +587,7 @@ namespace giftcard_api.Controllers
             {
                 return Unauthorized("Invalid refresh token.");
             }
-            // Génération du nouveau token
+
             var newToken = await _jwtService.GenerateToken(user);
             var newRefreshToken = _jwtService.GenerateRefreshToken();
             _jwtService.SaveRefreshToken(user, newRefreshToken);

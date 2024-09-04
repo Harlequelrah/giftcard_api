@@ -8,7 +8,7 @@ namespace giftcard_api.Models
 {
     public class Package
     {
-        // Attributs privés
+
         private string _nomPackage;
 
         private int _id;
@@ -21,10 +21,10 @@ namespace giftcard_api.Models
 
 
 
-        // Propriété statique
 
 
-        // Propriétés publiques
+
+
 
 
 

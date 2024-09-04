@@ -76,7 +76,7 @@ namespace giftcard_api.Services
 
         public void SaveRefreshToken(User user, string refreshToken)
         {
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Durée de validité du refresh token
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             user.RefreshToken = refreshToken;
             _context.SaveChanges();
         }
@@ -97,27 +97,27 @@ public bool ValidateTokenWithoutExpiration(string token)
         var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        // Paramètres de validation
+
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
-            ValidateLifetime = false, // Désactiver la validation de la date d'expiration
+            ValidateLifetime = false,
             ValidIssuer = _configuration["Jwt:Issuer"],
             ValidAudience = _configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
 
-        // Valider le token
+
         tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-        // Si le token est valide
+
         return true;
     }
     catch
     {
-        // Si le token n'est pas valide
+
         return false;
     }
 }
@@ -128,28 +128,28 @@ public bool ValidateTokenWithExpiration(string token)
         var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        // Paramètres de validation
+
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
-            ValidateLifetime = true, // Activer la validation de la date d'expiration
-            ClockSkew = TimeSpan.Zero, // Désactiver la tolérance par défaut (5 minutes)
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidIssuer = _configuration["Jwt:Issuer"],
             ValidAudience = _configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
 
-        // Valider le token
+
         tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-        // Si le token est valide
+
         return true;
     }
     catch
     {
-        // Si le token n'est pas valide ou est expiré
+
         return false;
     }
 }

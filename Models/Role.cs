@@ -9,7 +9,7 @@ namespace giftcard_api.Models
 {
     public class Role
     {
-        // Attribut privé
+
         private int _id;
         private string _roleNom;
 

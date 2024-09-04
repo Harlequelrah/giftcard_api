@@ -27,7 +27,7 @@ namespace giftcard_api.Services
                 .Select(r => r.RoleNom)
                 .FirstOrDefaultAsync();
 
-            return role; // Renvoie null si aucun rôle n'est trouvé
+            return role;
         }
     }
     public static class UtilityDate

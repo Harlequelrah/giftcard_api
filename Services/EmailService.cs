@@ -53,23 +53,31 @@ namespace giftcard_api.Services
             var jsonContent = JsonSerializer.Serialize(emailMessage);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Ajout du token d'authentification
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            // Envoi de la requête POST
-            var response = await _httpClient.PostAsync(url, content);
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Email sent successfully: {responseContent}");
-                return true;
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Email sent successfully: {responseContent}");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                Console.WriteLine("Une erreur inattendue est survenue dans l'envoi du mail : " + ex.Message);
                 return false;
             }
+
 
         }
 
@@ -78,22 +86,22 @@ namespace giftcard_api.Services
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
 
-            // Création du générateur de QR Code
+
             using (var qrGenerator = new QRCodeGenerator())
             {
-                // Création des données QR Code
+
                 using (var qrCodeData = qrGenerator.CreateQrCode(qrCodeToken, QRCodeGenerator.ECCLevel.Q))
                 {
-                    // Création du QR Code en format PNG
+
                     using (var qrCode = new PngByteQRCode(qrCodeData))
                     {
                         byte[] qrCodeImage = qrCode.GetGraphic(20);
 
-                        // Conversion de l'image QR Code en Base64
+
                         var qrCodeBase64 = Convert.ToBase64String(qrCodeImage);
                         var qrCodeImageSrc = $"data:image/png;base64,{qrCodeBase64}";
 
-                        // Création du message email
+
                         var emailMessage = new EmailMessage
                         {
                             From = new EmailAddress
@@ -117,25 +125,33 @@ namespace giftcard_api.Services
                             Category = "Envoi de Carte Cadeau"
                         };
 
-                        // Sérialisation de l'email en JSON
+
                         var jsonContent = JsonSerializer.Serialize(emailMessage);
                         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                        // Ajout du token d'authentification
+
                         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                        // Envoi de la requête POST
-                        var response = await _httpClient.PostAsync(url, content);
 
-                        if (response.IsSuccessStatusCode)
+                        try
                         {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            Console.WriteLine($"Email sent successfully: {responseContent}");
-                            return true;
+                            var response = await _httpClient.PostAsync(url, content);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseContent = await response.Content.ReadAsStringAsync();
+                                Console.WriteLine($"Email sent successfully: {responseContent}");
+                                return true;
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                                return false;
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                            Console.WriteLine("Une erreur inattendue est survenue dans l'envoi du mail : " + ex.Message);
                             return false;
                         }
                     }
@@ -177,6 +193,8 @@ namespace giftcard_api.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
+                        try
+            {
             var response = await _httpClient.PostAsync(url, content);
 
             if (response.IsSuccessStatusCode)
@@ -188,6 +206,12 @@ namespace giftcard_api.Services
             else
             {
                 Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
+                return false;
+            }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Une erreur inattendue est survenue dans l'envoi du mail : " + ex.Message);
                 return false;
             }
         }
@@ -226,6 +250,8 @@ namespace giftcard_api.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
+                     try
+            {
             var response = await _httpClient.PostAsync(url, content);
 
             if (response.IsSuccessStatusCode)
@@ -239,8 +265,14 @@ namespace giftcard_api.Services
                 Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
                 return false;
             }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Une erreur inattendue est survenue dans l'envoi du mail : " + ex.Message);
+                return false;
+            }
         }
-                public async Task<bool> SendRechargeEmailAsync(string email, string beneficiary,string souscripteur, string montant)
+        public async Task<bool> SendRechargeEmailAsync(string email, string beneficiary, string souscripteur, string montant)
         {
 
             var url = _configuration["SendMailAPI:Url"];
@@ -274,6 +306,8 @@ namespace giftcard_api.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
+                 try
+            {
             var response = await _httpClient.PostAsync(url, content);
 
             if (response.IsSuccessStatusCode)
@@ -287,8 +321,14 @@ namespace giftcard_api.Services
                 Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
                 return false;
             }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Une erreur inattendue est survenue dans l'envoi du mail : " + ex.Message);
+                return false;
+            }
         }
-    
+
     }
 
 

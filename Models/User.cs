@@ -7,7 +7,7 @@ namespace giftcard_api.Models
 {
     public class User
     {
-        // Attributs privés
+
         private int _id;
         private int _idRole=5;
         private string _email;

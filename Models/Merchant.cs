@@ -7,14 +7,14 @@ namespace giftcard_api.Models
 {
     public class Merchant
     {
-        // Attributs privés
+
         private int _id;
         private int _idUser;
         private int _idMerchantWallet;
         private string _nom;
         private string _prenom;
 
-        // Propriétés publiques
+
         [Key]
         public int Id
         {

@@ -7,7 +7,7 @@ namespace giftcard_api.Models
 {
     public class Beneficiary
     {
-        // Attributs privés
+
         private int _id;
         private int? _idUser = null;
         private int _idSubscriber;
@@ -20,7 +20,7 @@ namespace giftcard_api.Models
         private string _telephoneNumero;
 
 
-        // Propriétés publiques
+
         [Key]
         public int Id
         {
