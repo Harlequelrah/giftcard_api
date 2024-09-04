@@ -71,7 +71,7 @@ namespace giftcard_api.Controllers
             }
             else if (type == "merchant")
             {
-                var  merchant = await _context.Subscribers.FindAsync(walletUpdateDto.Id);
+                var  merchant = await _context.Merchants.FindAsync(walletUpdateDto.Id);
                 if (merchant == null)
                 {
                     return NotFound("Marchand Non Trouvé");
@@ -105,6 +105,7 @@ namespace giftcard_api.Controllers
             try
             {
                 var Id=(user.Id).ToString();
+                Console.WriteLine("Id: " + Id);
                 var message = "Le solde de votre Carte Cadeau a été mis à jour à  Par Le Support GoChap.";
                 await _hubContext.Clients.User(Id).SendAsync("ReceiveMessage", message);
                 await _context.SaveChangesAsync();
