@@ -243,6 +243,7 @@ namespace giftcard_api.Controllers
                     }
                     await _hubContext.Clients.User(merchantId).SendAsync("ReceiveMessage", message);
                     emailresponse = await _emailService.SendPayementEmailAsync(beneficiary.Email, montantAchat, nomMarchand, soldeRestant);
+                    Console.WriteLine("email response: " + emailresponse);
                     return Ok(new { beneficiaryWallet, merchantHistory, merchantWallet, EmailResponse = emailresponse });
 
                 }

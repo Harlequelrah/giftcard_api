@@ -81,10 +81,11 @@ namespace giftcard_api.Services
 
         }
 
-        public async Task<bool> SendEmailAsync(string email, string qrCodeToken, string montant)
+        public async Task<bool> SendEmailAsync(string email, string qrCodeToken, string montant , string subscriber)
         {
             var url = _configuration["SendMailAPI:Url"];
             var token = _configuration["SendMailAPI:Token"];
+            Console.WriteLine($"montant:{montant}");
 
 
             using (var qrGenerator = new QRCodeGenerator())
@@ -115,7 +116,7 @@ namespace giftcard_api.Services
                             },
                             Subject = "Vous avez reçu une Carte Cadeau !",
                             Html = $@"
-                                Félicitations ! Vous venez de recevoir une carte cadeau sous forme de QR code d'une valeur de {montant} XOF.
+                                Félicitations ! Vous venez de recevoir une carte cadeau sous forme de QR code d'une valeur de {montant} XOF offerte par {subscriber}.
                                 Dans le but de fidéliser sa clientèle, GoChap lance sa toute dernière innovation.
                                 Cette carte cadeau vous permet d'opérer des achats auprès de nos marchands qui acceptent le paiement par carte cadeau.
                                 <div style='text-align:center; margin:10px 0;'>

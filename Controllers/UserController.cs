@@ -225,6 +225,7 @@ namespace giftcard_api.Controllers
                     await _context.SaveChangesAsync();
 
                     var token = await _jwtService.GenerateToken(user);
+                    await _emailService.SendSubscriberRegistrationEmailAsync(user.Email,subscriber.SubscriberName);
                     return Ok(new { Token = token, subscriber, subscriberWallet, subscriberHistory });
                 }
                 catch (Exception ex)
@@ -500,7 +501,8 @@ namespace giftcard_api.Controllers
                         var subscriberUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == subscriber.IdUser);
 
 
-                        var emailresponse = await _emailService.SendSubscriberRegistrationEmailAsync(subscriberUser.Email, subscriber.SubscriberName);
+                        var emailresponse = await _emailService.SendEmailAsync(beneficiary.Email, token , $"{(double)cartecadeau}",subscriber.SubscriberName);
+                        
 
 
 
